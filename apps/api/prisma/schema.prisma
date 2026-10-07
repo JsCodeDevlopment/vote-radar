@@ -1,0 +1,424 @@
+// Politica Tracker - schema inicial.
+// Regra de produto: toda informacao factual relevante referencia uma Source rastreavel.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── Enums ─────────────
+
+enum SourceType {
+  OFFICIAL
+  PRESS
+  POLITICIAN
+  OTHER
+}
+
+enum Office {
+  PRESIDENTE
+  SENADOR
+  DEPUTADO_FEDERAL
+  DEPUTADO_ESTADUAL
+}
+
+enum BodyType {
+  CAMARA_FEDERAL
+  SENADO
+  ASSEMBLEIA_ESTADUAL
+  EXECUTIVO_FEDERAL
+}
+
+enum TermStatus {
+  IN_OFFICE
+  ON_LEAVE
+  ENDED
+}
+
+enum VoteChoice {
+  YES
+  NO
+  ABSTENTION
+  OBSTRUCTION
+  ABSENT
+  OTHER
+}
+
+enum PolicyPosition {
+  AGREE
+  DISAGREE
+  NEUTRAL
+}
+
+enum ClassificationSource {
+  OFFICIAL
+  RULE
+  AI
+  HUMAN
+}
+
+enum CompatibilityResult {
+  COMPATIBLE
+  INCOMPATIBLE
+  NOT_EVALUABLE
+}
+
+enum PromiseStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  PARTIAL
+  COMPLETED
+  ABANDONED
+  UNVERIFIED
+}
+
+// ───────────── Fontes ─────────────
+
+model Source {
+  id          String     @id @default(cuid())
+  type        SourceType
+  name        String // ex.: "Camara dos Deputados"
+  publisher   String?
+  url         String
+  publishedAt DateTime?
+  retrievedAt DateTime   @default(now())
+  hash        String? // hash do payload bruto, p/ detectar mudancas
+
+  expenses      Expense[]
+  votes         VoteRecord[]
+  proposals     Proposal[]
+  statusHistory ProposalStatusHistory[]
+  news          NewsArticle[]
+  staff         StaffMember[]
+  politicians   Politician[]
+  votings       Voting[]
+  promises      GovernmentPromise[]
+
+  @@index([url])
+}
+
+// ───────────── Usuarios ─────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions  Session[]
+  following UserFollow[]
+  positions UserPolicyPosition[]
+}
+
+model Session {
+  id               String    @id @default(cuid())
+  userId           String
+  refreshTokenHash String
+  userAgent        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserFollow {
+  userId       String
+  politicianId String
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@id([userId, politicianId])
+}
+
+// ───────────── Politicos ─────────────
+
+model Party {
+  id      String  @id @default(cuid())
+  acronym String  @unique
+  name    String?
+
+  terms PoliticianTerm[]
+}
+
+// Casa/orgao: Camara, Senado, cada Assembleia Estadual, Presidencia.
+model LegislativeBody {
+  id   String   @id @default(cuid())
+  type BodyType
+  name String
+  uf   String? // null p/ esfera federal
+
+  terms PoliticianTerm[]
+
+  @@unique([type, uf])
+}
+
+model Politician {
+  id         String    @id @default(cuid())
+  externalId String // id na fonte de origem
+  origin     String // CAMARA | SENADO | ALESP | TSE ...
+  name       String
+  civilName  String?
+  photoUrl   String?
+  email      String?
+  birthDate  DateTime?
+  sourceId   String?
+
+  source    Source?             @relation(fields: [sourceId], references: [id])
+  terms     PoliticianTerm[]
+  expenses  Expense[]
+  staff     StaffMember[]
+  votes     VoteRecord[]
+  authored  ProposalAuthor[]
+  news      NewsArticle[]
+  followers UserFollow[]
+  promises  GovernmentPromise[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([origin, externalId])
+  @@index([name])
+}
+
+model PoliticianTerm {
+  id           String     @id @default(cuid())
+  politicianId String
+  office       Office
+  bodyId       String
+  partyId      String?
+  uf           String?
+  status       TermStatus
+  startDate    DateTime?
+  endDate      DateTime?
+
+  politician Politician      @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  body       LegislativeBody @relation(fields: [bodyId], references: [id])
+  party      Party?          @relation(fields: [partyId], references: [id])
+
+  @@index([politicianId])
+  @@index([office, uf])
+}
+
+// ───────────── Despesas e gabinete ─────────────
+
+model Expense {
+  id           String   @id @default(cuid())
+  externalId   String
+  origin       String
+  politicianId String
+  category     String
+  supplier     String?
+  amountCents  BigInt
+  date         DateTime
+  year         Int
+  documentUrl  String?
+  sourceId     String
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  source     Source     @relation(fields: [sourceId], references: [id])
+
+  @@unique([origin, externalId])
+  @@index([politicianId, year])
+}
+
+model StaffMember {
+  id           String    @id @default(cuid())
+  externalId   String
+  origin       String
+  politicianId String
+  role         String
+  startDate    DateTime?
+  endDate      DateTime?
+  sourceId     String
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  source     Source     @relation(fields: [sourceId], references: [id])
+
+  @@unique([origin, externalId])
+}
+
+// ───────────── Proposicoes ─────────────
+
+model Proposal {
+  id             String    @id @default(cuid())
+  externalId     String
+  origin         String
+  type           String // PL, PEC, MPV...
+  number         Int
+  year           Int
+  title          String?
+  summary        String // ementa
+  currentStatus  String?
+  lastMovementAt DateTime?
+  sourceId       String
+
+  source  Source                  @relation(fields: [sourceId], references: [id])
+  authors ProposalAuthor[]
+  history ProposalStatusHistory[]
+  votings Voting[]
+  topics  ProposalPolicy[]
+
+  @@unique([origin, externalId])
+  @@index([type, number, year])
+}
+
+model ProposalAuthor {
+  proposalId   String
+  politicianId String
+
+  proposal   Proposal   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@id([proposalId, politicianId])
+}
+
+model ProposalStatusHistory {
+  id          String   @id @default(cuid())
+  proposalId  String
+  sequence    Int
+  oldStatus   String?
+  newStatus   String
+  description String?
+  changedAt   DateTime
+  sourceId    String
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  source   Source   @relation(fields: [sourceId], references: [id])
+
+  @@unique([proposalId, sequence])
+}
+
+// ───────────── Votacoes ─────────────
+
+model Voting {
+  id          String   @id @default(cuid())
+  externalId  String
+  origin      String
+  proposalId  String?
+  description String?
+  result      String? // aprovada / rejeitada
+  nominal     Boolean  @default(true)
+  votedAt     DateTime
+  sourceId    String
+
+  proposal Proposal?    @relation(fields: [proposalId], references: [id])
+  source   Source       @relation(fields: [sourceId], references: [id])
+  records  VoteRecord[]
+
+  @@unique([origin, externalId])
+}
+
+model VoteRecord {
+  id           String     @id @default(cuid())
+  votingId     String
+  politicianId String
+  choice       VoteChoice
+  rawChoice    String? // valor original da fonte
+  sourceId     String
+
+  voting     Voting     @relation(fields: [votingId], references: [id], onDelete: Cascade)
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  source     Source     @relation(fields: [sourceId], references: [id])
+
+  @@unique([votingId, politicianId])
+}
+
+// ───────────── Politicas publicas e compatibilidade ─────────────
+
+model PolicyTopic {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  policies Policy[]
+}
+
+model Policy {
+  id          String  @id @default(cuid())
+  topicId     String
+  name        String
+  description String?
+
+  topic     PolicyTopic          @relation(fields: [topicId], references: [id])
+  positions UserPolicyPosition[]
+  proposals ProposalPolicy[]
+
+  @@unique([topicId, name])
+}
+
+model UserPolicyPosition {
+  userId   String
+  policyId String
+  position PolicyPosition
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, policyId])
+}
+
+// Associa proposicao a politica. `supportsPolicy` indica se APROVAR a proposicao
+// favorece (true) ou contraria (false) a politica - base da compatibilidade.
+model ProposalPolicy {
+  proposalId     String
+  policyId       String
+  supportsPolicy Boolean
+  classifiedBy   ClassificationSource
+  confidence     Float?
+  rationale      String? // "Por que essa classificacao?"
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  policy   Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@id([proposalId, policyId])
+}
+
+// ───────────── Noticias ─────────────
+
+model NewsArticle {
+  id           String     @id @default(cuid())
+  title        String
+  description  String?
+  url          String     @unique
+  imageUrl     String?
+  author       String?
+  sourceName   String
+  sourceUrl    String?
+  sourceType   SourceType
+  publishedAt  DateTime
+  politicianId String?
+  sourceId     String?
+  createdAt    DateTime   @default(now())
+
+  politician Politician? @relation(fields: [politicianId], references: [id])
+  source     Source?     @relation(fields: [sourceId], references: [id])
+
+  @@index([politicianId, publishedAt])
+}
+
+// ───────────── Executivo: propostas de governo ─────────────
+
+model GovernmentPromise {
+  id           String        @id @default(cuid())
+  politicianId String
+  electionYear Int
+  area         String
+  text         String
+  status       PromiseStatus @default(UNVERIFIED)
+  verifiedAt   DateTime?
+  sourceId     String
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  source     Source     @relation(fields: [sourceId], references: [id])
+}
