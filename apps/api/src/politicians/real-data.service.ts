@@ -141,9 +141,11 @@ export class RealDataService implements OnModuleInit {
     this.cache.set(key, { data, expiry: Date.now() + ttlMs });
   }
 
-  async onModuleInit() {
-    this.logger.log('Inicializando sincronização oficial com TSE, Câmara dos Deputados e Senado Federal...');
-    await this.syncFromOfficialSources().catch((err) => {
+  private syncPromise: Promise<void> | null = null;
+
+  onModuleInit() {
+    this.logger.log('Inicializando sincronização oficial em segundo plano...');
+    this.syncPromise = this.syncFromOfficialSources().catch((err) => {
       this.logger.warn(`Erro na sincronização oficial inicial: ${err?.message}`);
     });
   }
@@ -153,7 +155,7 @@ export class RealDataService implements OnModuleInit {
    * Não utiliza registros fictícios; carrega 100% dos parlamentares em exercício na legislatura atual.
    */
   async syncFromOfficialSources() {
-    if (this.isFetching) return;
+    if (this.isFetching) return this.syncPromise ?? Promise.resolve();
     this.isFetching = true;
 
     try {
@@ -164,7 +166,7 @@ export class RealDataService implements OnModuleInit {
       try {
         const presRes = await fetch(
           `${TSE_API}/candidatura/listar/2022/BR/${TSE_ELECTION_ID}/1/candidatos`,
-          { headers: { Accept: 'application/json' } },
+          { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(5000) },
         );
         if (presRes.ok) {
           const presData = (await presRes.json()) as any;
@@ -225,6 +227,7 @@ export class RealDataService implements OnModuleInit {
       try {
         const camaraRes = await fetch(`${CAMARA_API}/deputados?idLegislatura=57&ordem=ASC&ordenarPor=nome&itens=1000`, {
           headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(6000),
         });
 
         if (camaraRes.ok) {
@@ -287,6 +290,7 @@ export class RealDataService implements OnModuleInit {
       try {
         const senadoRes = await fetch(`${SENADO_API}/lista/atual`, {
           headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(6000),
         });
 
         if (senadoRes.ok) {
@@ -342,14 +346,20 @@ export class RealDataService implements OnModuleInit {
         this.logger.warn(`Erro ao sincronizar Senado Federal: ${err?.message}`);
       }
 
+      // Disponibiliza as autoridades federais imediatamente para requisições rápidas
+      if (this.politicians.length === 0 && updatedList.length > 0) {
+        this.politicians = [...updatedList];
+        this.logger.log(`Primeiro lote carregado (${this.politicians.length} autoridades federais). Sincronizando estados...`);
+      }
+
       // 4. Governadores de todos os 26 Estados e do Distrito Federal (TSE)
       try {
-        await Promise.all(
+        await Promise.allSettled(
           BRAZIL_UFS.map(async (uf) => {
             try {
               const res = await fetch(
                 `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/3/candidatos`,
-                { headers: { Accept: 'application/json' } },
+                { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4000) },
               );
               if (res.ok) {
                 const data = (await res.json()) as any;
@@ -417,13 +427,13 @@ export class RealDataService implements OnModuleInit {
 
       // 5. Deputados Estaduais e Distritais (TSE — Todas as 27 Assembleias Legislativas e CLDF)
       try {
-        await Promise.all(
+        await Promise.allSettled(
           BRAZIL_UFS.map(async (uf) => {
             const cargo = uf === 'DF' ? '8' : '7';
             try {
               const res = await fetch(
                 `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/${cargo}/candidatos`,
-                { headers: { Accept: 'application/json' } },
+                { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4000) },
               );
               if (res.ok) {
                 const data = (await res.json()) as any;
@@ -514,7 +524,14 @@ export class RealDataService implements OnModuleInit {
     pageSize?: number;
   }): Promise<Paginated<PoliticianSummary>> {
     if (this.politicians.length === 0) {
-      await this.syncFromOfficialSources();
+      if (this.syncPromise) {
+        await Promise.race([
+          this.syncPromise,
+          new Promise((resolve) => setTimeout(resolve, 3500)),
+        ]);
+      } else {
+        await this.syncFromOfficialSources();
+      }
     }
 
     let list = this.politicians;
@@ -590,7 +607,14 @@ export class RealDataService implements OnModuleInit {
 
   async listParties(): Promise<string[]> {
     if (this.politicians.length === 0) {
-      await this.syncFromOfficialSources();
+      if (this.syncPromise) {
+        await Promise.race([
+          this.syncPromise,
+          new Promise((resolve) => setTimeout(resolve, 3500)),
+        ]);
+      } else {
+        await this.syncFromOfficialSources();
+      }
     }
     const parties = new Set<string>();
     for (const p of this.politicians) {

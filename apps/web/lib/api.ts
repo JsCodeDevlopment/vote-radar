@@ -20,7 +20,7 @@ import type {
   UserPositions,
 } from './types';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000').trim().replace(/\/+$/, '');
 export const TOKEN_KEY = 'pt:token';
 
 export class ApiError extends Error {
@@ -40,7 +40,9 @@ export async function getDataMode(): Promise<'api'> {
 
 async function http<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
-  const res = await fetch(`${API_URL}${path}`, {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const fullUrl = `${API_URL}${cleanPath}`;
+  const res = await fetch(fullUrl, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
