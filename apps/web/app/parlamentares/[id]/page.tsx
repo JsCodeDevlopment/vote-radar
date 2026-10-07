@@ -1,7 +1,8 @@
 'use client';
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 import { FollowButton } from '@/components/politicians';
 import { Avatar, CompatibilityMeter, ErrorState, KindBadge, Loading, SourceLink } from '@/components/ui';
@@ -37,11 +38,29 @@ function ProfileInner() {
   const router = useRouter();
   const { user, ready } = useAuth();
   const [officeModalOpen, setOfficeModalOpen] = useState(false);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
   const requestedTab = params.get('aba');
   const tab: TabKey =
     requestedTab === 'cargo'
       ? 'cargo'
       : (TABS.find((t) => t.key === requestedTab)?.key ?? 'resumo');
+
+  // Auto-scroll da aba ativa para o centro no carregamento ou troca de aba
+  useEffect(() => {
+    if (tabsContainerRef.current) {
+      const activeBtn = tabsContainerRef.current.querySelector('.profile-tab-btn.active') as HTMLElement;
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+  }, [tab]);
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabsContainerRef.current) {
+      const amount = direction === 'left' ? -220 : 220;
+      tabsContainerRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   const pol = useAsync(() => api.getPolitician(id), [id]);
   const compat = useAsync(() => api.getCompatibility(id), [id, user?.id], ready && !!user);
@@ -276,20 +295,53 @@ function ProfileInner() {
         </button>
       </div>
 
-      {/* ── Navegação em Abas (Sleek Tabs Strip) ── */}
-      <div className="profile-tabs-strip" role="tablist">
-        {TABS.map((t) => (
+      {/* ── Navegação em Abas (Scrollable Tabs Strip com Indicador e Controles) ── */}
+      <div className="profile-tabs-wrapper">
+        <div className="profile-tabs-mobile-cue flex sm:hidden items-center justify-between px-3 py-1.5 mb-2.5 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="text-primary font-bold">↔</span> Deslize para ver todas as opções
+          </span>
+          <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">
+            {TABS.length} seções
+          </span>
+        </div>
+
+        <div className="profile-tabs-scroll-container">
           <button
-            key={t.key}
-            role="tab"
-            aria-selected={tab === t.key}
-            className={`profile-tab-btn ${tab === t.key ? 'active' : ''}`}
-            onClick={() => router.replace(`/parlamentares/${id}?aba=${t.key}`, { scroll: false })}
+            type="button"
+            className="profile-tabs-scroll-btn"
+            onClick={() => scrollTabs('left')}
+            aria-label="Rolar abas para a esquerda"
+            title="Rolar para esquerda"
           >
-            <span>{t.icon}</span>
-            <span>{t.label}</span>
+            <ChevronLeft size={18} />
           </button>
-        ))}
+
+          <div className="profile-tabs-strip" role="tablist" ref={tabsContainerRef}>
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                role="tab"
+                aria-selected={tab === t.key}
+                className={`profile-tab-btn ${tab === t.key ? 'active' : ''}`}
+                onClick={() => router.replace(`/parlamentares/${id}?aba=${t.key}`, { scroll: false })}
+              >
+                <span>{t.icon}</span>
+                <span>{t.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="profile-tabs-scroll-btn"
+            onClick={() => scrollTabs('right')}
+            aria-label="Rolar abas para a direita"
+            title="Rolar para direita"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
 
       {tab === 'resumo' && <SummaryTab politician={p} compatibility={compat.data} />}

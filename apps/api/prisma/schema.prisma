@@ -1,4 +1,4 @@
-// Politica Tracker - schema inicial.
+// Vote Radar - schema inicial.
 // Regra de produto: toda informacao factual relevante referencia uma Source rastreavel.
 
 generator client {

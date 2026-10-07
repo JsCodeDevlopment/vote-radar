@@ -16,9 +16,16 @@ export default function RegisterPage() {
 
   return (
     <div className="card auth-card">
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border">
+        <img src="/logo.png" alt="Vote Radar" className="w-10 h-10 rounded-lg object-contain shadow-sm border border-primary/20" />
+        <div>
+          <span className="font-mono font-bold text-base text-foreground block">Vote Radar</span>
+          <span className="text-xs text-muted-foreground font-mono">Crie sua conta para fiscalizar e comparar</span>
+        </div>
+      </div>
       <h1>Criar conta</h1>
       <p className="muted">
-        Coletamos apenas o necessário. Suas posições políticas são <strong>privadas</strong> e visíveis
+        Coletamos apenas o necessário. Suas posições no Vote Radar são <strong>privadas</strong> e visíveis
         somente para você.
       </p>
       <form

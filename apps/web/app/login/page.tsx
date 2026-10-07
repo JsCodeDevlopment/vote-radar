@@ -15,8 +15,15 @@ export default function LoginPage() {
 
   return (
     <div className="card auth-card">
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border">
+        <img src="/logo.png" alt="Vote Radar" className="w-10 h-10 rounded-lg object-contain shadow-sm border border-primary/20" />
+        <div>
+          <span className="font-mono font-bold text-base text-foreground block">Vote Radar</span>
+          <span className="text-xs text-muted-foreground font-mono">Portal de Fiscalização e Transparência</span>
+        </div>
+      </div>
       <h1>Entrar</h1>
-      <p className="muted">Acompanhe seus parlamentares e suas políticas.</p>
+      <p className="muted">Acesse sua conta para acompanhar seus parlamentares e posições.</p>
       <form
         className="stack"
         onSubmit={async (e) => {

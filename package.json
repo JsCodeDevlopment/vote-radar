@@ -1,5 +1,5 @@
 {
-  "name": "politica-tracker",
+  "name": "vote-radar",
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {

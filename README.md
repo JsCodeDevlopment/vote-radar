@@ -1,4 +1,4 @@
-# Política Tracker 🇧🇷
+# Vote Radar 🇧🇷
 
 Plataforma de acompanhamento de mandato e transparência política. Confronte a atuação de parlamentares com suas próprias posições sobre políticas públicas, com rastreabilidade total até a **fonte primária oficial**.
 
@@ -21,7 +21,7 @@ Plataforma de acompanhamento de mandato e transparência política. Confronte a 
 ## 📁 Estrutura do Monorepo
 
 ```text
-politica-tracker/
+vote-radar/
 ├── apps/
 │   ├── web/               # Frontend Next.js (App Router, React 19, TypeScript)
 │   │   ├── app/           # Rotas: /, /explorar, /parlamentares/[id], /proposicoes/[id],
