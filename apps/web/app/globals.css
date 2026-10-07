@@ -590,7 +590,7 @@ a.card:hover, a.v-card:hover {
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 860px) {
   .header-inner {
     height: 62px;
     justify-content: space-between;
@@ -615,10 +615,13 @@ a.card:hover, a.v-card:hover {
 .mobile-drawer-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 999;
+  z-index: 99998;
   animation: fadeIn 0.18s ease-out;
 }
 
@@ -629,13 +632,16 @@ a.card:hover, a.v-card:hover {
   bottom: 0;
   width: 86%;
   max-width: 360px;
+  height: 100vh;
+  height: 100dvh;
   background: var(--card);
   border-left: 1px solid var(--border);
-  z-index: 1000;
+  z-index: 99999;
   display: flex;
   flex-direction: column;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.75);
   animation: slideLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
 @keyframes slideLeft {
@@ -654,11 +660,13 @@ a.card:hover, a.v-card:hover {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   background: color-mix(in oklch, var(--muted) 30%, var(--card));
+  flex-shrink: 0;
 }
 
 .mobile-drawer-body {
   padding: 20px 18px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   gap: 22px;
