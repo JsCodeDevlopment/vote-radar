@@ -3143,38 +3143,47 @@ export class RealDataService implements OnModuleInit {
         const res = await fetch(staffUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
         if (res.ok) {
           const text = await res.text();
-          const rows = [...text.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-          const roleMap = new Map<string, number>();
-          let count = 0;
+          // Isola a tabela da seção "Em exercício", descartando a tabela de "Histórico de contratação"
+          const emExercMatch = text.match(/Em\s+exerc[íi]cio[\s\S]*?<table[^>]*>([\s\S]*?)<\/table>/i);
+          const tableHtml = emExercMatch ? emExercMatch[1] : '';
 
-          for (const row of rows.slice(1)) {
-            const cols = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) =>
-              c[1].replace(/<[^>]+>/g, '').trim(),
-            );
-            if (cols.length >= 2) {
-              count++;
-              const role = cols[1] || 'Secretário Parlamentar';
-              roleMap.set(role, (roleMap.get(role) || 0) + 1);
+          if (tableHtml) {
+            const tbodyMatch = tableHtml.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/i);
+            const content = tbodyMatch ? tbodyMatch[1] : tableHtml;
+            const rows = [...content.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+            const roleMap = new Map<string, number>();
+            let count = 0;
+
+            for (const row of rows) {
+              const cols = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) =>
+                c[1].replace(/<[^>]+>/g, '').trim(),
+              );
+              // Ignora cabeçalhos ou linhas de aviso
+              if (cols.length >= 2 && cols[0] && !cols[0].toLowerCase().includes('nenhum')) {
+                count++;
+                const role = cols[1] || 'Secretário Parlamentar';
+                roleMap.set(role, (roleMap.get(role) || 0) + 1);
+              }
             }
-          }
 
-          if (count > 0) {
-            const byRole = Array.from(roleMap.entries())
-              .map(([role, c]) => ({ role, count: c }))
-              .sort((a, b) => b.count - a.count);
+            if (count > 0) {
+              const byRole = Array.from(roleMap.entries())
+                .map(([role, c]) => ({ role, count: c }))
+                .sort((a, b) => b.count - a.count);
 
-            return {
-              total: count,
-              byRole,
-              source: {
-                id: `src:camara:staff:${p.externalId}`,
-                type: 'OFFICIAL',
-                name: 'Câmara dos Deputados — Quadro de Pessoal do Gabinete',
-                publisher: 'Departamento de Pessoal da Câmara dos Deputados',
-                url: staffUrl,
-                retrievedAt: new Date().toISOString(),
-              },
-            };
+              return {
+                total: count,
+                byRole,
+                source: {
+                  id: `src:camara:staff:${p.externalId}`,
+                  type: 'OFFICIAL',
+                  name: 'Câmara dos Deputados — Quadro de Pessoal do Gabinete',
+                  publisher: 'Departamento de Pessoal da Câmara dos Deputados',
+                  url: staffUrl,
+                  retrievedAt: new Date().toISOString(),
+                },
+              };
+            }
           }
         }
       } catch (err: any) {
@@ -3189,28 +3198,41 @@ export class RealDataService implements OnModuleInit {
         const res = await fetch(staffUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
         if (res.ok) {
           const text = await res.text();
-          const rows = [...text.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+          const tableMatches = [...text.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)];
+          const seenEmployees = new Set<string>();
           const roleMap = new Map<string, number>();
-          let count = 0;
 
-          for (const row of rows.slice(1)) {
-            const cols = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) =>
-              c[1].replace(/<[^>]+>/g, '').trim(),
-            );
-            if (cols.length >= 2) {
-              count++;
-              const role = cols[1] || 'Assessor Parlamentar';
-              roleMap.set(role, (roleMap.get(role) || 0) + 1);
+          for (const t of tableMatches) {
+            const tableHtml = t[1];
+            const capMatch = tableHtml.match(/<caption[^>]*>([\s\S]*?)<\/caption>/i);
+            const defaultRole = capMatch ? capMatch[1].replace(/<[^>]+>/g, '').trim() : 'Assessor Parlamentar';
+
+            const tbodyMatch = tableHtml.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/i);
+            const content = tbodyMatch ? tbodyMatch[1] : tableHtml;
+            const rows = [...content.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+
+            for (const row of rows) {
+              const cols = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) =>
+                c[1].replace(/<[^>]+>/g, '').trim(),
+              );
+              if (cols.length >= 2 && cols[0]) {
+                const name = cols[0].toUpperCase();
+                if (!seenEmployees.has(name)) {
+                  seenEmployees.add(name);
+                  const role = cols[2] || defaultRole || cols[1] || 'Assessor Parlamentar';
+                  roleMap.set(role, (roleMap.get(role) || 0) + 1);
+                }
+              }
             }
           }
 
-          if (count > 0) {
+          if (seenEmployees.size > 0) {
             const byRole = Array.from(roleMap.entries())
               .map(([role, c]) => ({ role, count: c }))
               .sort((a, b) => b.count - a.count);
 
             return {
-              total: count,
+              total: seenEmployees.size,
               byRole,
               source: {
                 id: `src:senado:staff:${p.externalId}`,
