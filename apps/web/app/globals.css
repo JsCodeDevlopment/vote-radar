@@ -2183,42 +2183,63 @@ details.why p { margin: 8px 0 0; color: var(--foreground); }
 .profile-tabs-wrapper {
   margin-bottom: 24px;
   position: relative;
+  width: 100%;
+}
+
+.profile-tabs-mobile-cue {
+  display: none;
+}
+@media (max-width: 900px) {
+  .profile-tabs-mobile-cue {
+    display: flex;
+  }
 }
 
 .profile-tabs-scroll-container {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
   border-bottom: 2px solid var(--border);
+  width: 100%;
+  overflow: visible;
 }
 
+/* Fita de abas:
+   - Em desktop (>900px): SEM scroll (nem horizontal, nem vertical); todas as abas se encaixam naturalmente.
+   - Em responsivo (<=900px): APENAS scroll horizontal suave; scroll vertical NUNCA permitido. */
 .profile-tabs-strip {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 4px 4px 6px;
+  gap: 6px;
   flex: 1;
-  -webkit-overflow-scrolling: touch;
+  align-items: flex-end;
+  margin-bottom: -2px;
+  padding: 0;
+  overflow: visible;
 }
 
-/* Scrollbar visível e estilizada no mobile para ficar 100% evidente que há mais opções */
 @media (max-width: 900px) {
   .profile-tabs-strip {
+    overflow-x: auto;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: none;
+    padding-bottom: 2px;
     scrollbar-width: thin;
-    scrollbar-color: var(--primary) transparent;
+    scrollbar-color: color-mix(in oklch, var(--primary) 50%, transparent) transparent;
   }
+
   .profile-tabs-strip::-webkit-scrollbar {
     height: 4px;
     display: block;
   }
   .profile-tabs-strip::-webkit-scrollbar-track {
-    background: color-mix(in oklch, var(--muted) 40%, transparent);
-    border-radius: 999px;
+    background: transparent;
   }
   .profile-tabs-strip::-webkit-scrollbar-thumb {
-    background: var(--primary);
+    background: color-mix(in oklch, var(--primary) 50%, transparent);
     border-radius: 999px;
   }
 }
@@ -2236,7 +2257,7 @@ details.why p { margin: 8px 0 0; color: var(--foreground); }
   cursor: pointer;
   flex-shrink: 0;
   transition: all var(--t-micro);
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 .profile-tabs-scroll-btn:hover {
   color: var(--foreground);
@@ -2253,7 +2274,7 @@ details.why p { margin: 8px 0 0; color: var(--foreground); }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 10px 16px;
   font-family: var(--font-mono);
   font-size: 0.88rem;
   font-weight: 600;
@@ -2261,12 +2282,13 @@ details.why p { margin: 8px 0 0; color: var(--foreground); }
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -8px;
   cursor: pointer;
   white-space: nowrap;
   transition: all var(--t-micro);
   border-radius: 8px 8px 0 0;
   flex-shrink: 0;
+  user-select: none;
+  line-height: 1.2;
 }
 .profile-tab-btn:hover {
   color: var(--foreground);
@@ -2278,3 +2300,12 @@ details.why p { margin: 8px 0 0; color: var(--foreground); }
   background: color-mix(in oklch, var(--primary) 12%, transparent);
   font-weight: 700;
 }
+
+@media (max-width: 640px) {
+  .profile-tab-btn {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+}
+

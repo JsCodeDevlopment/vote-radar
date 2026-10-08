@@ -45,12 +45,21 @@ function ProfileInner() {
       ? 'cargo'
       : (TABS.find((t) => t.key === requestedTab)?.key ?? 'resumo');
 
-  // Auto-scroll da aba ativa para o centro no carregamento ou troca de aba
+  // Auto-scroll horizontal da aba ativa para o centro no carregamento ou troca de aba (apenas quando em modo responsivo com overflow)
   useEffect(() => {
-    if (tabsContainerRef.current) {
-      const activeBtn = tabsContainerRef.current.querySelector('.profile-tab-btn.active') as HTMLElement;
+    const container = tabsContainerRef.current;
+    if (!container) return;
+
+    // Apenas rola se o container realmente tiver overflow horizontal (modo responsivo)
+    if (container.scrollWidth > container.clientWidth) {
+      const activeBtn = container.querySelector<HTMLElement>('.profile-tab-btn.active');
       if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        const targetScrollLeft =
+          activeBtn.offsetLeft - container.clientWidth / 2 + activeBtn.clientWidth / 2;
+        container.scrollTo({
+          left: Math.max(0, targetScrollLeft),
+          behavior: 'smooth',
+        });
       }
     }
   }, [tab]);
@@ -297,7 +306,7 @@ function ProfileInner() {
 
       {/* ── Navegação em Abas (Scrollable Tabs Strip com Indicador e Controles) ── */}
       <div className="profile-tabs-wrapper">
-        <div className="profile-tabs-mobile-cue flex sm:hidden items-center justify-between px-3 py-1.5 mb-2.5 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground font-mono">
+        <div className="profile-tabs-mobile-cue items-center justify-between px-3 py-1.5 mb-2.5 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground font-mono">
           <span className="flex items-center gap-1.5">
             <span className="text-primary font-bold">↔</span> Deslize para ver todas as opções
           </span>
