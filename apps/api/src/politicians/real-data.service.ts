@@ -1109,417 +1109,199 @@ export class RealDataService implements OnModuleInit {
         this.logger.warn(`Erro ao buscar votações do Senado: ${err?.message}`);
       }
 
-      if (votes.length === 0) {
-        const keySenateVotings = [
-          {
-            num: 45,
-            type: 'PEC',
-            ano: year || 2023,
-            title: 'Reforma Tributária sobre o Consumo (PEC 45/2019 no Senado)',
-            desc: 'Apreciação em 2º turno da proposta de emenda à Constituição que unifica tributos sobre o consumo (IBS/CBS).',
-            choice: 'YES' as const,
-            rawChoice: 'Sim',
-            result: 'Aprovada no Plenário',
-            votedAt: `${year || 2023}-11-08T21:40:00.000Z`,
-            senCod: '159874',
-          },
-          {
-            num: 32,
-            type: 'PLP',
-            ano: year || 2024,
-            title: 'Marco Fiscal e Limite de Gastos da União',
-            desc: 'Regulamentação das metas fiscais sustentáveis e limites de endividamento da administração pública federal.',
-            choice: 'NO' as const,
-            rawChoice: 'Não',
-            result: 'Rejeitada',
-            votedAt: `${year || 2024}-06-19T18:10:00.000Z`,
-            senCod: '160210',
-          },
-          {
-            num: 12,
-            type: 'PRS',
-            ano: year || 2024,
-            title: 'Fixação de Alíquotas e Equalização de Débitos Federativos',
-            desc: 'Projeto de Resolução do Senado disciplinando juros da dívida dos Estados com a União.',
-            choice: 'ABSTENTION' as const,
-            rawChoice: 'Abstenção',
-            result: 'Aprovada no Plenário',
-            votedAt: `${year || 2024}-08-14T19:30:00.000Z`,
-            senCod: '161045',
-          },
-        ];
-
-        for (const item of keySenateVotings) {
-          const propId = `prop-sen-${item.senCod}`;
-          const materiaUrl = `https://www25.senado.leg.br/web/atividade/materias/-/materia/${item.senCod}`;
-          const policies = this.extractPolicyMatches(item.desc, item.choice === 'YES');
-
-          const fullProp: ProposalDetail = {
-            id: propId,
-            type: item.type,
-            number: item.num,
-            year: item.ano,
-            title: item.title,
-            summary: item.desc,
-            currentStatus: item.result,
-            lastMovementAt: item.votedAt,
-            authors: [{ id: p.id, name: p.name }],
-            topics: ['Legislação Federal'],
-            votingsCount: 1,
-            source: {
-              id: `src:sen:vot:${item.senCod}`,
-              type: 'OFFICIAL',
-              name: 'Senado Federal',
-              publisher: 'Secretaria-Geral da Mesa do Senado',
-              url: materiaUrl,
-              retrievedAt: new Date().toISOString(),
-            },
-            history: [
-              {
-                id: `hist-sen-${item.senCod}`,
-                sequence: 1,
-                newStatus: item.result,
-                description: item.desc,
-                changedAt: item.votedAt,
-                source: {
-                  id: `src:sen:hist:${item.senCod}`,
-                  type: 'OFFICIAL',
-                  name: 'Senado Federal',
-                  url: materiaUrl,
-                  retrievedAt: new Date().toISOString(),
-                },
-              },
-            ],
-            votings: [],
-            policies,
-          };
-          this.proposalCache.set(propId, fullProp);
-
-          votes.push({
-            id: `v-sen-${item.senCod}-${p.id}`,
-            choice: item.choice,
-            rawChoice: item.rawChoice,
-            voting: {
-              id: `vot-sen-${item.senCod}`,
-              description: item.desc,
-              result: item.result,
-              nominal: true,
-              votedAt: item.votedAt,
-              source: {
-                id: `src:sen:vot:${item.senCod}`,
-                type: 'OFFICIAL',
-                name: 'Senado Federal (Painel Eletrônico)',
-                publisher: 'Secretaria-Geral da Mesa do Senado',
-                url: materiaUrl,
-                retrievedAt: new Date().toISOString(),
-              },
-            },
-            proposal: {
-              id: propId,
-              type: item.type,
-              number: item.num,
-              year: item.ano,
-              title: item.title,
-              summary: item.desc,
-            },
-            policies,
-            source: {
-              id: `src:sen:vot:${item.senCod}`,
-              type: 'OFFICIAL',
-              name: 'Senado Federal',
-              publisher: 'Dados Abertos do Senado Federal',
-              url: materiaUrl,
-              retrievedAt: new Date().toISOString(),
-            },
-          });
-        }
-      }
     }
 
     // 2. Deputado Federal: busca votações nominais oficiais da Câmara dos Deputados
     if (p.office === 'DEPUTADO_FEDERAL' && p.externalId) {
       try {
         const depIdNum = Number(p.externalId);
-        const queryParams = new URLSearchParams({
-          ordem: 'DESC',
-          ordenarPor: 'dataHoraRegistro',
-          itens: '35',
-        });
+        let candidateVotacoes: any[] = [];
+
         if (year) {
-          queryParams.set('dataInicio', `${year}-01-01`);
-          queryParams.set('dataFim', `${year}-12-31`);
+          // A API da Câmara restringe o intervalo entre datas a no máximo 3 meses (90 dias).
+          // Dividimos o ano solicitado em 4 trimestres para evitar o erro HTTP 400.
+          const quarters = [
+            { ini: `${year}-10-01`, fim: `${year}-12-31` },
+            { ini: `${year}-07-01`, fim: `${year}-09-30` },
+            { ini: `${year}-04-01`, fim: `${year}-06-30` },
+            { ini: `${year}-01-01`, fim: `${year}-03-31` },
+          ];
+          const quarterResults = await Promise.all(
+            quarters.map(async (q) => {
+              try {
+                const qParams = new URLSearchParams({
+                  idOrgao: '180',
+                  dataInicio: q.ini,
+                  dataFim: q.fim,
+                  ordem: 'DESC',
+                  ordenarPor: 'dataHoraRegistro',
+                  itens: '25',
+                });
+                const res = await fetch(`${CAMARA_API}/votacoes?${qParams.toString()}`, {
+                  headers: { Accept: 'application/json' },
+                });
+                if (res.ok) {
+                  const json = (await res.json()) as any;
+                  return Array.isArray(json?.dados) ? json.dados : [];
+                }
+              } catch {}
+              return [];
+            }),
+          );
+          candidateVotacoes = quarterResults.flat();
+        } else {
+          // Sem ano especificado: busca as votações plenárias mais recentes e períodos com alta atividade
+          // legislativa nominal da 57ª Legislatura (2023-2026).
+          const fetchPlen = async (params: Record<string, string>) => {
+            try {
+              const qParams = new URLSearchParams({
+                idOrgao: '180',
+                ordem: 'DESC',
+                ordenarPor: 'dataHoraRegistro',
+                ...params,
+              });
+              const res = await fetch(`${CAMARA_API}/votacoes?${qParams.toString()}`, {
+                headers: { Accept: 'application/json' },
+              });
+              if (res.ok) {
+                const json = (await res.json()) as any;
+                return Array.isArray(json?.dados) ? json.dados : [];
+              }
+            } catch {}
+            return [];
+          };
+
+          const [recentBatch, q2024, q2023] = await Promise.all([
+            fetchPlen({ itens: '35' }),
+            fetchPlen({ dataInicio: '2024-03-01', dataFim: '2024-05-31', itens: '25' }),
+            fetchPlen({ dataInicio: '2023-08-01', dataFim: '2023-10-31', itens: '20' }),
+          ]);
+          candidateVotacoes = [...recentBatch, ...q2024, ...q2023];
         }
 
-        const resVotacoes = await fetch(`${CAMARA_API}/votacoes?${queryParams.toString()}`, {
-          headers: { Accept: 'application/json' },
-        });
+        // Deduplica votações pelo identificador único
+        const uniqueVotacoesMap = new Map<string, any>();
+        for (const v of candidateVotacoes) {
+          if (v && v.id) uniqueVotacoesMap.set(v.id, v);
+        }
+        const uniqueVotacoes = Array.from(uniqueVotacoesMap.values());
 
-        if (resVotacoes.ok) {
-          const jsonVotacoes = (await resVotacoes.json()) as any;
-          const rawVotacoes: any[] = Array.isArray(jsonVotacoes?.dados) ? jsonVotacoes.dados : [];
-
+        // Processa em lotes de concorrência controlada (máx 5 simultâneos) para respeitar o rate-limit da Câmara
+        const chunkSize = 5;
+        for (let i = 0; i < uniqueVotacoes.length; i += chunkSize) {
+          const chunk = uniqueVotacoes.slice(i, i + chunkSize);
           await Promise.all(
-            rawVotacoes.map(async (v) => {
+            chunk.map(async (v) => {
               try {
-                const resVotos = await fetch(`${CAMARA_API}/votacoes/${v.id}/votos`);
-                if (resVotos.ok) {
-                  const jsonVotos = (await resVotos.json()) as any;
-                  const votoDep = jsonVotos.dados?.find((x: any) => x.deputado_?.id === depIdNum);
-                  if (votoDep) {
-                    const tipoVoto = (votoDep.tipoVoto || '').trim();
-                    const { choice, label } = this.normalizeVoteChoice(tipoVoto);
+                // Cache em memória dos votos de cada votação
+                let votosList = this.getFromCache<any[]>(`camara:votos:${v.id}`);
+                if (!votosList) {
+                  const resVotos = await fetch(`${CAMARA_API}/votacoes/${v.id}/votos`, {
+                    headers: { Accept: 'application/json' },
+                  });
+                  if (resVotos.ok) {
+                    const jsonVotos = (await resVotos.json()) as any;
+                    votosList = Array.isArray(jsonVotos?.dados) ? jsonVotos.dados : [];
+                    this.setInCache(`camara:votos:${v.id}`, votosList, 24 * 60 * 60 * 1000);
+                  }
+                }
 
-                    const officialUrl = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${v.id.split('-')[0]}`;
-                    const desc = v.descricao || 'Deliberação no Plenário da Câmara dos Deputados';
-                    const policies = this.extractPolicyMatches(desc, choice === 'YES');
+                if (!votosList || votosList.length === 0) return;
 
-                    const propMatch = desc.match(/\b(PEC|PLP|PL|MPV|PDL|PDC|REQ)\s*(?:n[º°])?\s*(\d+)(?:\s*(?:de|\/)\s*(\d{4}))?/i);
-                    const propType = propMatch ? propMatch[1].toUpperCase() : 'PL';
-                    const propNum = propMatch ? Number(propMatch[2]) : 0;
-                    const propYear = propMatch && propMatch[3] ? Number(propMatch[3]) : (Number(v.data?.slice(0, 4)) || 2024);
-                    const propTitle = propMatch ? `${propType} ${propNum}/${propYear}` : `Votação ${v.id}`;
-                    const propId = `prop-cam-${v.id}`;
-                    const cleanPropId = v.id.split('-')[0];
+                const votoDep = votosList.find((x: any) => x.deputado_?.id === depIdNum);
+                if (votoDep) {
+                  const tipoVoto = (votoDep.tipoVoto || '').trim();
+                  const { choice, label } = this.normalizeVoteChoice(tipoVoto);
 
-                    const fullProp: ProposalDetail = {
+                  const cleanPropId = v.id.split('-')[0];
+                  const officialUrl = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${cleanPropId}`;
+                  const desc = v.descricao || 'Deliberação no Plenário da Câmara dos Deputados';
+                  const policies = this.extractPolicyMatches(desc, choice === 'YES');
+
+                  const propMatch = desc.match(
+                    /\b(PEC|PLP|PL|MPV|PDL|PDC|REQ)\s*(?:n[º°])?\s*(\d+)(?:\s*(?:de|\/)\s*(\d{4}))?/i,
+                  );
+                  let propType = propMatch ? propMatch[1].toUpperCase() : 'PL';
+                  let propNum = propMatch ? Number(propMatch[2]) : 0;
+                  let propYear =
+                    propMatch && propMatch[3] ? Number(propMatch[3]) : Number(v.data?.slice(0, 4)) || 2024;
+                  let propSummary = desc;
+
+                  // Se a votação não descreve o tipo e número do projeto diretamente no texto,
+                  // consulta os metadados oficiais da proposição para exibir sigla, número, ano e ementa oficiais
+                  if (!propMatch && cleanPropId && /^\d+$/.test(cleanPropId)) {
+                    let propInfo = this.getFromCache<any>(`camara:prop:${cleanPropId}`);
+                    if (!propInfo) {
+                      try {
+                        const resP = await fetch(`${CAMARA_API}/proposicoes/${cleanPropId}`, {
+                          headers: { Accept: 'application/json' },
+                        });
+                        if (resP.ok) {
+                          const jP = (await resP.json()) as any;
+                          if (jP?.dados) {
+                            propInfo = jP.dados;
+                            this.setInCache(`camara:prop:${cleanPropId}`, propInfo, 24 * 60 * 60 * 1000);
+                          }
+                        }
+                      } catch {}
+                    }
+                    if (propInfo) {
+                      propType = propInfo.siglaTipo || propType;
+                      propNum = propInfo.numero || propNum;
+                      propYear = propInfo.ano || propYear;
+                      if (propInfo.ementa) propSummary = propInfo.ementa;
+                    }
+                  }
+
+                  const propTitle = propNum > 0 ? `${propType} ${propNum}/${propYear}` : `Proposição ${cleanPropId}`;
+                  const propId = `prop-${cleanPropId}`;
+
+                  votes.push({
+                    id: `v-cam-${v.id}-${politicianId}`,
+                    choice,
+                    rawChoice: label,
+                    voting: {
+                      id: `vot-cam-${v.id}`,
+                      description: desc,
+                      result: v.aprovacao === 1 ? 'Aprovada no Plenário' : 'Concluída / Rejeitada',
+                      nominal: true,
+                      votedAt: v.dataHoraRegistro ? `${v.dataHoraRegistro}.000Z` : new Date().toISOString(),
+                      source: {
+                        id: `src:cam:vot:${v.id}`,
+                        type: 'OFFICIAL',
+                        name: 'Câmara dos Deputados (Painel Eletrônico)',
+                        publisher: 'Mesa Diretora da Câmara dos Deputados',
+                        url: officialUrl,
+                        retrievedAt: new Date().toISOString(),
+                      },
+                    },
+                    proposal: {
                       id: propId,
                       type: propType,
                       number: propNum,
                       year: propYear,
                       title: propTitle,
-                      summary: desc,
-                      currentStatus: v.aprovacao === 1 ? 'Aprovada em Plenário' : 'Concluída / Rejeitada',
-                      lastMovementAt: v.dataHoraRegistro ? `${v.dataHoraRegistro}.000Z` : new Date().toISOString(),
-                      authors: [{ id: 'camara', name: 'Câmara dos Deputados' }],
-                      topics: ['Legislação Federal'],
-                      votingsCount: 1,
-                      source: {
-                        id: `src:cam:vot:${v.id}`,
-                        type: 'OFFICIAL',
-                        name: 'Câmara dos Deputados',
-                        publisher: 'Portal de Tramitação da Câmara',
-                        url: officialUrl,
-                        retrievedAt: new Date().toISOString(),
-                      },
-                      history: [
-                        {
-                          id: `hist-cam-${v.id}`,
-                          sequence: 1,
-                          newStatus: v.aprovacao === 1 ? 'Aprovada no Plenário' : 'Rejeitada no Plenário',
-                          description: desc,
-                          changedAt: v.dataHoraRegistro ? `${v.dataHoraRegistro}.000Z` : new Date().toISOString(),
-                          source: {
-                            id: `src:cam:hist:${v.id}`,
-                            type: 'OFFICIAL',
-                            name: 'Câmara dos Deputados',
-                            url: officialUrl,
-                            retrievedAt: new Date().toISOString(),
-                          },
-                        },
-                      ],
-                      votings: [],
-                      policies,
-                    };
-                    this.proposalCache.set(propId, fullProp);
-                    this.proposalCache.set(`prop-${cleanPropId}`, fullProp);
-
-                    votes.push({
-                      id: `v-cam-${v.id}-${politicianId}`,
-                      choice,
-                      rawChoice: label,
-                      voting: {
-                        id: `vot-cam-${v.id}`,
-                        description: desc,
-                        result: v.aprovacao === 1 ? 'Aprovada' : 'Concluída / Rejeitada',
-                        nominal: true,
-                        votedAt: v.dataHoraRegistro ? `${v.dataHoraRegistro}.000Z` : new Date().toISOString(),
-                        source: {
-                          id: `src:cam:vot:${v.id}`,
-                          type: 'OFFICIAL',
-                          name: 'Câmara dos Deputados (Painel Eletrônico)',
-                          publisher: 'Mesa Diretora da Câmara dos Deputados',
-                          url: officialUrl,
-                          retrievedAt: new Date().toISOString(),
-                        },
-                      },
-                      proposal: {
-                        id: propId,
-                        type: propType,
-                        number: propNum,
-                        year: propYear,
-                        title: propTitle,
-                        summary: desc,
-                      },
-                      policies,
-                      source: {
-                        id: `src:cam:vot:${v.id}`,
-                        type: 'OFFICIAL',
-                        name: 'Câmara dos Deputados',
-                        publisher: 'Dados Abertos da Câmara dos Deputados',
-                        url: officialUrl,
-                        retrievedAt: new Date().toISOString(),
-                      },
-                    });
-                  }
+                      summary: propSummary,
+                    },
+                    policies,
+                    source: {
+                      id: `src:cam:vot:${v.id}`,
+                      type: 'OFFICIAL',
+                      name: 'Câmara dos Deputados',
+                      publisher: 'Dados Abertos da Câmara dos Deputados',
+                      url: officialUrl,
+                      retrievedAt: new Date().toISOString(),
+                    },
+                  });
                 }
               } catch {}
             }),
           );
+
+          if (votes.length >= 35) break;
         }
       } catch (err: any) {
         this.logger.warn(`Erro ao buscar votações nominais da Câmara: ${err?.message}`);
-      }
-
-      if (votes.length === 0) {
-        const keyVotings = [
-          {
-            num: 74,
-            type: 'PLP',
-            ano: year || 2026,
-            title: 'Regulamentação e Transparência de Recursos Públicos',
-            desc: 'Subemenda Substitutiva ao Projeto de Lei Complementar nº 74/2026, com regras de governança e prestação de contas.',
-            choice: 'YES' as const,
-            rawChoice: 'Sim',
-            result: 'Aprovada no Plenário',
-            votedAt: `${year || 2026}-09-03T17:28:34.000Z`,
-            votId: '2611313-31',
-          },
-          {
-            num: 995,
-            type: 'PDL',
-            ano: year || 2026,
-            title: 'Indicação ao Tribunal de Contas da União',
-            desc: 'Projeto de Decreto Legislativo nº 995/2026 aprovando indicação para o TCU.',
-            choice: 'YES' as const,
-            rawChoice: 'Sim',
-            result: 'Aprovada no Plenário',
-            votedAt: `${year || 2026}-09-02T13:53:25.000Z`,
-            votId: '2645346-18',
-          },
-          {
-            num: 155,
-            type: 'REQ',
-            ano: year || 2026,
-            title: 'Regime de Urgência Parlamentar para Pautas Estratégicas',
-            desc: 'Requerimento de Urgência (Art. 155 do RICD) para tramitação prioritária de projetos de desenvolvimento econômico.',
-            choice: 'YES' as const,
-            rawChoice: 'Sim',
-            result: 'Aprovada',
-            votedAt: `${year || 2026}-09-01T17:57:04.000Z`,
-            votId: '2643915-8',
-          },
-          {
-            num: 1045,
-            type: 'PL',
-            ano: year || 2024,
-            title: 'Incentivo à Primeira Contratação e Qualificação Jovem',
-            desc: 'Criação de incentivos tributários para contratação de jovens aprendizes e capacitação profissional técnica.',
-            choice: 'NO' as const,
-            rawChoice: 'Não',
-            result: 'Rejeitada',
-            votedAt: `${year || 2024}-03-14T16:30:00.000Z`,
-            votId: '2289100-12',
-          },
-          {
-            num: 501,
-            type: 'PEC',
-            ano: year || 2023,
-            title: 'Modernização Administrativa e Eficiência dos Serviços Públicos',
-            desc: 'Emenda Constitucional sobre metas de desempenho e digitalização dos serviços ao cidadão.',
-            choice: 'ABSTENTION' as const,
-            rawChoice: 'Abstenção',
-            result: 'Aprovada em 1º Turno',
-            votedAt: `${year || 2023}-11-28T20:15:00.000Z`,
-            votId: '2154300-45',
-          },
-        ];
-
-        for (const item of keyVotings) {
-          const propId = `prop-cam-${item.votId}`;
-          const cleanId = item.votId.split('-')[0];
-          const officialUrl = `https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=${cleanId}`;
-          const policies = this.extractPolicyMatches(item.desc, item.choice === 'YES');
-
-          const fullProp: ProposalDetail = {
-            id: propId,
-            type: item.type,
-            number: item.num,
-            year: item.ano,
-            title: item.title,
-            summary: item.desc,
-            currentStatus: item.result,
-            lastMovementAt: item.votedAt,
-            authors: [{ id: p.id, name: p.name }],
-            topics: ['Legislação Federal'],
-            votingsCount: 1,
-            source: {
-              id: `src:cam:vot:${item.votId}`,
-              type: 'OFFICIAL',
-              name: 'Câmara dos Deputados',
-              publisher: 'Mesa Diretora da Câmara dos Deputados',
-              url: officialUrl,
-              retrievedAt: new Date().toISOString(),
-            },
-            history: [
-              {
-                id: `hist-cam-${item.votId}`,
-                sequence: 1,
-                newStatus: item.result,
-                description: item.desc,
-                changedAt: item.votedAt,
-                source: {
-                  id: `src:cam:hist:${item.votId}`,
-                  type: 'OFFICIAL',
-                  name: 'Câmara dos Deputados',
-                  url: officialUrl,
-                  retrievedAt: new Date().toISOString(),
-                },
-              },
-            ],
-            votings: [],
-            policies,
-          };
-          this.proposalCache.set(propId, fullProp);
-          this.proposalCache.set(`prop-${cleanId}`, fullProp);
-
-          votes.push({
-            id: `v-cam-${item.votId}-${p.id}`,
-            choice: item.choice,
-            rawChoice: item.rawChoice,
-            voting: {
-              id: `vot-cam-${item.votId}`,
-              description: item.desc,
-              result: item.result,
-              nominal: true,
-              votedAt: item.votedAt,
-              source: {
-                id: `src:cam:vot:${item.votId}`,
-                type: 'OFFICIAL',
-                name: 'Câmara dos Deputados (Painel Eletrônico)',
-                publisher: 'Mesa Diretora da Câmara dos Deputados',
-                url: officialUrl,
-                retrievedAt: new Date().toISOString(),
-              },
-            },
-            proposal: {
-              id: propId,
-              type: item.type,
-              number: item.num,
-              year: item.ano,
-              title: item.title,
-              summary: item.desc,
-            },
-            policies,
-            source: {
-              id: `src:cam:vot:${item.votId}`,
-              type: 'OFFICIAL',
-              name: 'Câmara dos Deputados',
-              publisher: 'Dados Abertos da Câmara dos Deputados',
-              url: officialUrl,
-              retrievedAt: new Date().toISOString(),
-            },
-          });
-        }
       }
     }
 
@@ -2277,13 +2059,11 @@ export class RealDataService implements OnModuleInit {
    * Obtém os detalhes completos de uma proposição legislativa diretamente das fontes oficiais.
    */
   async getProposal(id: string): Promise<ProposalDetail> {
-    // 1. Verifica cache em memória (preenchido por getVotes e getProposals)
-    if (this.proposalCache.has(id)) {
-      return this.proposalCache.get(id)!;
-    }
+    // 1. Verifica cache em memória (somente se já possuir detalhes completos com histórico de tramitações)
     const altId1 = id.startsWith('prop-') ? id.replace(/^prop-/, '') : `prop-${id}`;
-    if (this.proposalCache.has(altId1)) {
-      return this.proposalCache.get(altId1)!;
+    const cached = this.proposalCache.get(id) || this.proposalCache.get(altId1);
+    if (cached && Array.isArray(cached.history) && cached.history.length > 1) {
+      return cached;
     }
 
     // 2. Matérias e Proposições do Senado Federal
