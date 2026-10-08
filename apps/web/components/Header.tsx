@@ -5,12 +5,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from './AuthProvider';
-import { Menu, X, Compass, Scale, Building2, LogIn, UserPlus, LogOut, User as UserIcon } from 'lucide-react';
+import { Menu, X, Compass, Scale, Building2, Megaphone, LogIn, UserPlus, LogOut, User as UserIcon } from 'lucide-react';
 
 const NAV = [
   { href: '/explorar', label: 'Explorar', icon: Compass, description: 'Parlamentares, Governadores e Presidente' },
   { href: '/politicas', label: 'Políticas', icon: Scale, description: 'Seu alinhamento com temas e votações' },
   { href: '/dashboard', label: 'Meus parlamentares', icon: Building2, description: 'Painel de acompanhamento personalizado' },
+  { href: '/como-cobrar', label: 'Como Cobrar', icon: Megaphone, description: 'Guia cívico de controle social e modelos de cobrança' },
 ];
 
 export function Header() {

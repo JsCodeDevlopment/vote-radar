@@ -14,6 +14,7 @@ import { AssetsTab } from '@/features/politician/AssetsTab';
 import { StaffTab } from '@/features/politician/StaffTab';
 import { NewsTab } from '@/features/politician/NewsTab';
 import { OfficeTab } from '@/features/politician/OfficeTab';
+import { AccountabilityTab } from '@/features/politician/AccountabilityTab';
 import { OfficeExplanationModal } from '@/features/politician/OfficeExplanationModal';
 import { useAsync } from '@/hooks/useAsync';
 import { api } from '@/lib/api';
@@ -29,6 +30,7 @@ const TABS = [
   { key: 'bens', label: 'Bens', icon: '💼' },
   { key: 'gabinete', label: 'Gabinete', icon: '👥' },
   { key: 'noticias', label: 'Notícias', icon: '📰' },
+  { key: 'cobranca', label: 'Como Cobrar', icon: '📢' },
 ] as const;
 type TabKey = (typeof TABS)[number]['key'] | 'cargo';
 
@@ -170,6 +172,15 @@ function ProfileInner() {
                 title={`Entenda o papel e atribuições de um(a) ${OFFICE_LABEL[p.office]}`}
               >
                 🏛️ O que faz este cargo?
+              </button>
+
+              <button
+                type="button"
+                className="v-btn -ghost -sm text-xs font-mono inline-flex items-center gap-1.5"
+                onClick={() => router.replace(`/parlamentares/${id}?aba=cobranca`, { scroll: false })}
+                title="Acesse canais de contato e modelos prontos para cobrar este parlamentar"
+              >
+                📢 Como Cobrar
               </button>
 
               {p.source?.url && (
@@ -367,6 +378,7 @@ function ProfileInner() {
       {tab === 'bens' && <AssetsTab politicianId={id} politician={p} />}
       {tab === 'gabinete' && <StaffTab politicianId={id} />}
       {tab === 'noticias' && <NewsTab politicianId={id} />}
+      {tab === 'cobranca' && <AccountabilityTab politician={p} />}
 
       <OfficeExplanationModal
         office={p.office}

@@ -44,7 +44,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <span className="font-mono font-bold tracking-tight text-foreground text-base">Vote Radar</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-mono">v2.0-real</span>
                 </div>
-                <div className="text-xs font-mono text-muted-foreground flex gap-4">
+                <div className="text-xs font-mono text-muted-foreground flex gap-4 items-center flex-wrap">
+                  <a href="/como-cobrar" className="text-primary hover:underline font-semibold">
+                    📢 Guia Como Cobrar
+                  </a>
+                  <span>·</span>
                   <span>Câmara dos Deputados</span>
                   <span>·</span>
                   <span>Senado Federal</span>
