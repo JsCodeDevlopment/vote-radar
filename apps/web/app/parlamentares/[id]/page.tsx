@@ -199,10 +199,12 @@ function ProfileInner() {
 
             {!user ? (
               <p className="text-xs text-muted-foreground">
+                {/* Link de login temporariamente oculto:
                 <Link href="/login" className="text-primary hover:underline font-bold">
                   Entre na sua conta
                 </Link>{' '}
-                e defina suas{' '}
+                e */}
+                Defina suas{' '}
                 <Link href="/politicas" className="text-primary hover:underline font-bold">
                   políticas
                 </Link>{' '}

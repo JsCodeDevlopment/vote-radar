@@ -102,6 +102,7 @@ export function Header() {
                 </button>
               </>
             ) : (
+              /* Botões de entrar e registrar temporariamente ocultos
               <>
                 <Link href="/login" className="v-btn -ghost -sm">
                   Entrar
@@ -110,6 +111,8 @@ export function Header() {
                   Criar conta
                 </Link>
               </>
+              */
+              null
             )}
           </div>
 
@@ -222,6 +225,7 @@ export function Header() {
                         </button>
                       </div>
                     ) : (
+                      /* Botões de entrar e registrar temporariamente ocultos
                       <div className="mobile-auth-buttons">
                         <Link
                           href="/login"
@@ -240,6 +244,8 @@ export function Header() {
                           Criar conta gratuita
                         </Link>
                       </div>
+                      */
+                      null
                     )}
                   </div>
                 </div>

@@ -69,11 +69,13 @@ export default function HomePage() {
         ) : !user ? (
           <div className="v-card row between p-6">
             <span className="text-muted-foreground text-sm font-mono">
-              Crie uma conta para acompanhar parlamentares e comparar votos nominais com o seu posicionamento.
+              Acompanhe parlamentares e compare votos nominais com o seu posicionamento cívico.
             </span>
+            {/* Botão de criar conta temporariamente oculto
             <Link href="/register" className="v-btn -accent -sm">
               Criar conta gratuita
             </Link>
+            */}
           </div>
         ) : following.loading ? (
           <Loading />
