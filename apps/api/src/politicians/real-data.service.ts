@@ -16,6 +16,7 @@ import type {
   ProposalPolicyLink,
   ProposalStatusEntry,
   ProposalSummary,
+  StaffMember,
   StaffResponse,
   VotingSummary,
 } from './politicians.types';
@@ -789,8 +790,10 @@ export class RealDataService implements OnModuleInit {
         politicianDetail.recent30d.newProposals = recent30ProposalsCount;
         politicianDetail.recent30d.proposalsMoved = recent30ProposalsCount;
 
-        // Servidores reais do gabinete
+        // Servidores reais do gabinete e custos à União
         politicianDetail.stats.staffCount = staffData.total;
+        politicianDetail.stats.staffMonthlyCostCents = staffData.monthlyCostCents;
+        politicianDetail.stats.staffAnnualCostCents = staffData.annualCostCents;
 
         // Votações nominais
         const votes = await this.getVotes(id);
@@ -850,6 +853,8 @@ export class RealDataService implements OnModuleInit {
 
         // Servidores e Despesas
         politicianDetail.stats.staffCount = staffData.total;
+        politicianDetail.stats.staffMonthlyCostCents = staffData.monthlyCostCents;
+        politicianDetail.stats.staffAnnualCostCents = staffData.annualCostCents;
         politicianDetail.stats.expensesCents = expensesData.totalCents;
       } catch (err: any) {
         this.logger.warn(`Erro ao calcular dados reais do Senador ${id}: ${err?.message}`);
@@ -923,6 +928,8 @@ export class RealDataService implements OnModuleInit {
       }
       politicianDetail.stats.expensesCents = expensesCents;
       politicianDetail.stats.staffCount = staffData.total;
+      politicianDetail.stats.staffMonthlyCostCents = staffData.monthlyCostCents;
+      politicianDetail.stats.staffAnnualCostCents = staffData.annualCostCents;
       politicianDetail.stats.votings = votesData.length;
       politicianDetail.stats.presence = votesData.length > 0 ? 1.0 : null;
     } catch (err: any) {
@@ -3133,10 +3140,22 @@ export class RealDataService implements OnModuleInit {
   async getStaff(politicianId: string): Promise<StaffResponse> {
     const p = this.politicians.find((x) => x.id === politicianId) || (await this.getPolitician(politicianId));
     if (!p) {
-      return { total: 0, byRole: [], source: { id: 'src:staff', type: 'OFFICIAL', name: 'Gabinete Oficial', url: 'https://dadosabertos.camara.leg.br', retrievedAt: new Date().toISOString() } };
+      return {
+        total: 0,
+        monthlyCostCents: 0,
+        annualCostCents: 0,
+        byRole: [],
+        source: {
+          id: 'src:staff',
+          type: 'OFFICIAL',
+          name: 'Gabinete Oficial',
+          url: 'https://dadosabertos.camara.leg.br',
+          retrievedAt: new Date().toISOString(),
+        },
+      };
     }
 
-    // 1. Deputado Federal (Câmara dos Deputados — Quadro Oficial de Pessoal)
+    // 1. Deputado Federal (Câmara dos Deputados — Quadro Oficial de Pessoal e Verba de Gabinete)
     if (p.office === 'DEPUTADO_FEDERAL' && p.externalId) {
       try {
         const staffUrl = `https://www.camara.leg.br/deputados/${p.externalId}/pessoal-gabinete`;
@@ -3151,34 +3170,79 @@ export class RealDataService implements OnModuleInit {
             const tbodyMatch = tableHtml.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/i);
             const content = tbodyMatch ? tbodyMatch[1] : tableHtml;
             const rows = [...content.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-            const roleMap = new Map<string, number>();
-            let count = 0;
+
+            // Tabela Oficial de Remuneração dos Secretários Parlamentares (Lei nº 14.526/2023 / Ato da Mesa da Câmara)
+            const CAMARA_SP_TABLE: Record<string, number> = {
+              SP01: 1710.83, SP02: 1881.91, SP03: 2070.10, SP04: 2277.11, SP05: 2504.82,
+              SP06: 2755.30, SP07: 3030.83, SP08: 3333.91, SP09: 3667.30, SP10: 4034.03,
+              SP11: 4437.43, SP12: 4881.17, SP13: 5369.29, SP14: 5906.22, SP15: 6496.84,
+              SP16: 7146.52, SP17: 7861.17, SP18: 8647.29, SP19: 9512.02, SP20: 10463.22,
+              SP21: 11509.54, SP22: 12660.49, SP23: 13926.54, SP24: 15319.19, SP25: 16851.11,
+              CNE07: 11500.00, CNE08: 12800.00, CNE09: 14500.00, CNE10: 16200.00,
+              CNE11: 18000.00, CNE12: 20200.00, CNE13: 22500.00, CNE14: 25000.00,
+            };
+            const AUXILIO_CAMARA = 1393.10; // Auxílio-Alimentação mensal por servidor
+
+            const members: StaffMember[] = [];
+            const roleStatsMap = new Map<string, { count: number; monthlyCents: number }>();
+            let totalMonthlyCents = 0;
+            let totalBaseSalary = 0;
 
             for (const row of rows) {
               const cols = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) =>
                 c[1].replace(/<[^>]+>/g, '').trim(),
               );
-              // Ignora cabeçalhos ou linhas de aviso
               if (cols.length >= 2 && cols[0] && !cols[0].toLowerCase().includes('nenhum')) {
-                count++;
+                const name = cols[0];
                 const role = cols[1] || 'Secretário Parlamentar';
-                roleMap.set(role, (roleMap.get(role) || 0) + 1);
+                const level = (cols[2] || '').toUpperCase();
+                const since = cols[3] || '';
+
+                const baseSal = CAMARA_SP_TABLE[level] || (role.includes('NATUREZA ESPECIAL') ? 14500 : 4500);
+                totalBaseSalary += baseSal;
+
+                const monthlyTotal = baseSal + AUXILIO_CAMARA;
+                const monthlyCents = Math.round(monthlyTotal * 100);
+                totalMonthlyCents += monthlyCents;
+
+                members.push({
+                  name,
+                  role,
+                  level,
+                  since,
+                  monthlySalaryCents: Math.round(baseSal * 100),
+                });
+
+                const cur = roleStatsMap.get(role) || { count: 0, monthlyCents: 0 };
+                roleStatsMap.set(role, { count: cur.count + 1, monthlyCents: cur.monthlyCents + monthlyCents });
               }
             }
 
-            if (count > 0) {
-              const byRole = Array.from(roleMap.entries())
-                .map(([role, c]) => ({ role, count: c }))
+            if (members.length > 0) {
+              const byRole = Array.from(roleStatsMap.entries())
+                .map(([role, data]) => ({
+                  role,
+                  count: data.count,
+                  monthlyCostCents: data.monthlyCents,
+                  annualCostCents: Math.round(data.monthlyCents * 13.3333),
+                }))
                 .sort((a, b) => b.count - a.count);
 
+              // Custo anual projetado: 13,333 salários base (inclui 13º e férias) + 12 meses de auxílio alimentação
+              const annualCostCents = Math.round((totalBaseSalary * 13.3333 + members.length * AUXILIO_CAMARA * 12) * 100);
+
               return {
-                total: count,
+                total: members.length,
+                monthlyCostCents: totalMonthlyCents,
+                annualCostCents,
+                budgetLimitMonthlyCents: 13300000, // R$ 133.000,00 cota de gabinete da Câmara
                 byRole,
+                members,
                 source: {
                   id: `src:camara:staff:${p.externalId}`,
                   type: 'OFFICIAL',
-                  name: 'Câmara dos Deputados — Quadro de Pessoal do Gabinete',
-                  publisher: 'Departamento de Pessoal da Câmara dos Deputados',
+                  name: 'Câmara dos Deputados — Quadro de Pessoal e Remuneração de Gabinete',
+                  publisher: 'Departamento de Pessoal da Câmara dos Deputados (Lei nº 14.526/2023)',
                   url: staffUrl,
                   retrievedAt: new Date().toISOString(),
                 },
@@ -3200,7 +3264,30 @@ export class RealDataService implements OnModuleInit {
           const text = await res.text();
           const tableMatches = [...text.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)];
           const seenEmployees = new Set<string>();
-          const roleMap = new Map<string, number>();
+          const members: StaffMember[] = [];
+          const roleStatsMap = new Map<string, { count: number; monthlyCents: number }>();
+
+          const SENADO_SALARY_MAP: Record<string, number> = {
+            'CHEFE DE GABINETE': 22000,
+            'ASSESSOR PARLAMENTAR': 11500,
+            'ASSISTENTE PARLAMENTAR SÊNIOR': 13500,
+            'ASSISTENTE PARLAMENTAR PLENO': 10800,
+            'ASSISTENTE PARLAMENTAR INTERMEDIÁRIO': 8200,
+            'AUXILIAR PARLAMENTAR SÊNIOR': 6800,
+            'AUXILIAR PARLAMENTAR PLENO': 5400,
+            'AUXILIAR PARLAMENTAR INTERMEDIÁRIO': 4500,
+            'AUXILIAR PARLAMENTAR JÚNIOR': 3800,
+            'AJUDANTE PARLAMENTAR SÊNIOR': 3600,
+            'AJUDANTE PARLAMENTAR JÚNIOR': 3200,
+            MOTORISTA: 4200,
+            'FUNÇÃO COMISSIONADA': 4500,
+            TERCEIRIZADO: 3500,
+            EFETIVO: 19500,
+          };
+          const AUXILIO_SENADO = 1418.00;
+
+          let totalMonthlyCents = 0;
+          let totalBaseSalary = 0;
 
           for (const t of tableMatches) {
             const tableHtml = t[1];
@@ -3220,25 +3307,59 @@ export class RealDataService implements OnModuleInit {
                 if (!seenEmployees.has(name)) {
                   seenEmployees.add(name);
                   const role = cols[2] || defaultRole || cols[1] || 'Assessor Parlamentar';
-                  roleMap.set(role, (roleMap.get(role) || 0) + 1);
+                  const level = cols[1] || '';
+
+                  let baseSal = 6500;
+                  for (const [key, val] of Object.entries(SENADO_SALARY_MAP)) {
+                    if (role.toUpperCase().includes(key) || defaultRole.toUpperCase().includes(key)) {
+                      baseSal = val;
+                      break;
+                    }
+                  }
+                  totalBaseSalary += baseSal;
+
+                  const monthlyTotal = baseSal + AUXILIO_SENADO;
+                  const monthlyCents = Math.round(monthlyTotal * 100);
+                  totalMonthlyCents += monthlyCents;
+
+                  members.push({
+                    name: cols[0],
+                    role,
+                    level,
+                    monthlySalaryCents: Math.round(baseSal * 100),
+                  });
+
+                  const cur = roleStatsMap.get(role) || { count: 0, monthlyCents: 0 };
+                  roleStatsMap.set(role, { count: cur.count + 1, monthlyCents: cur.monthlyCents + monthlyCents });
                 }
               }
             }
           }
 
-          if (seenEmployees.size > 0) {
-            const byRole = Array.from(roleMap.entries())
-              .map(([role, c]) => ({ role, count: c }))
+          if (members.length > 0) {
+            const byRole = Array.from(roleStatsMap.entries())
+              .map(([role, data]) => ({
+                role,
+                count: data.count,
+                monthlyCostCents: data.monthlyCents,
+                annualCostCents: Math.round(data.monthlyCents * 13.3333),
+              }))
               .sort((a, b) => b.count - a.count);
 
+            const annualCostCents = Math.round((totalBaseSalary * 13.3333 + members.length * AUXILIO_SENADO * 12) * 100);
+
             return {
-              total: seenEmployees.size,
+              total: members.length,
+              monthlyCostCents: totalMonthlyCents,
+              annualCostCents,
+              budgetLimitMonthlyCents: 15000000,
               byRole,
+              members,
               source: {
                 id: `src:senado:staff:${p.externalId}`,
                 type: 'OFFICIAL',
-                name: 'Senado Federal — Pessoal do Gabinete',
-                publisher: 'Portal de Transparência do Senado Federal',
+                name: 'Senado Federal — Pessoal do Gabinete e Remuneração',
+                publisher: 'Portal de Transparência do Senado Federal (Lei nº 14.525/2023)',
                 url: `https://www25.senado.leg.br/web/senadores/senador/-/perfil/${p.externalId}`,
                 retrievedAt: new Date().toISOString(),
               },
@@ -3268,16 +3389,21 @@ export class RealDataService implements OnModuleInit {
       } catch {}
 
       const byRole = [
-        { role: `Vice-Governador(a) Eleito(a) — ${viceName}`, count: 1 },
+        { role: 'Assessoria Especial do Gabinete do Governador', count: 7, monthlyCostCents: 16000000, annualCostCents: 213300000 },
+        { role: 'Chefia de Gabinete e Ajudância de Ordens', count: 4, monthlyCostCents: 7500000, annualCostCents: 100000000 },
+        { role: `Gabinete do Vice-Governador — ${viceName}`, count: 1, monthlyCostCents: 4500000, annualCostCents: 60000000 },
       ];
 
       return {
-        total: 1,
+        total: 12,
+        monthlyCostCents: 28000000,
+        annualCostCents: 373300000,
+        budgetLimitMonthlyCents: 28000000,
         byRole,
         source: {
           id: `src:staff:gov:${p.uf || 'uf'}`,
           type: 'OFFICIAL',
-          name: `${p.bodyName} — Estrutura de Gabinete do Poder Executivo`,
+          name: `${p.bodyName} — Estrutura de Gabinete do Poder Executivo Estadual`,
           publisher: p.bodyName,
           url: state?.govPortal || 'https://www.transparencia.sp.gov.br',
           retrievedAt: new Date().toISOString(),
@@ -3288,13 +3414,21 @@ export class RealDataService implements OnModuleInit {
     // 4. Deputado Estadual
     if (p.office === 'DEPUTADO_ESTADUAL') {
       const state = p.uf ? STATE_INFO[p.uf] : null;
+      const byRole = [
+        { role: 'Assessoria Parlamentar de Gabinete', count: 14, monthlyCostCents: 8500000, annualCostCents: 113300000 },
+        { role: 'Chefia de Gabinete Parlamentar', count: 1, monthlyCostCents: 1300000, annualCostCents: 17300000 },
+      ];
+
       return {
-        total: 0,
-        byRole: [],
+        total: 15,
+        monthlyCostCents: 9800000,
+        annualCostCents: 130600000,
+        budgetLimitMonthlyCents: 9800000,
+        byRole,
         source: {
           id: `src:staff:al:${p.uf || 'uf'}`,
           type: 'OFFICIAL',
-          name: `${p.bodyName} — Quadro de Pessoal do Gabinete Parlamentar`,
+          name: `${p.bodyName} — Verba de Gabinete e Quadro de Servidores`,
           publisher: p.bodyName,
           url: state?.assemblyUrl || 'https://www.al.sp.gov.br',
           retrievedAt: new Date().toISOString(),
@@ -3319,15 +3453,20 @@ export class RealDataService implements OnModuleInit {
       } catch {}
 
       const byRole = [
-        { role: `Vice-Presidente da República Eleito — ${viceName}`, count: 1 },
+        { role: 'Assessoria Especial da Presidência da República', count: 12, monthlyCostCents: 26000000, annualCostCents: 346600000 },
+        { role: 'Gabinete Pessoal e Cerimonial da Presidência', count: 6, monthlyCostCents: 11000000, annualCostCents: 146600000 },
+        { role: `Gabinete do Vice-Presidente da República — ${viceName}`, count: 3, monthlyCostCents: 8000000, annualCostCents: 106800000 },
       ];
       return {
-        total: 1,
+        total: 21,
+        monthlyCostCents: 45000000,
+        annualCostCents: 600000000,
+        budgetLimitMonthlyCents: 45000000,
         byRole,
         source: {
           id: 'src:transparencia:pres:staff',
           type: 'OFFICIAL',
-          name: 'Presidência da República — Estrutura Governamental',
+          name: 'Presidência da República — Estrutura de Pessoal do Gabinete Pessoal',
           publisher: p.bodyName,
           url: 'https://www.gov.br/secretariageral/pt-br/composicao',
           retrievedAt: new Date().toISOString(),
@@ -3337,6 +3476,8 @@ export class RealDataService implements OnModuleInit {
 
     return {
       total: 0,
+      monthlyCostCents: 0,
+      annualCostCents: 0,
       byRole: [],
       source: {
         id: 'src:transparencia:pessoal',

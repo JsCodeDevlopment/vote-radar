@@ -64,6 +64,8 @@ export interface PoliticianDetail extends PoliticianSummary {
     presence: number | null;
     expensesCents: number;
     staffCount: number;
+    staffMonthlyCostCents?: number;
+    staffAnnualCostCents?: number;
   };
   recent30d: {
     votings: number;
@@ -190,9 +192,28 @@ export interface AssetsResponse {
   source: Source;
 }
 
+export interface StaffMember {
+  name: string;
+  role: string;
+  level?: string;
+  since?: string;
+  monthlySalaryCents?: number;
+}
+
+export interface StaffRoleSummary {
+  role: string;
+  count: number;
+  monthlyCostCents?: number;
+  annualCostCents?: number;
+}
+
 export interface StaffResponse {
   total: number;
-  byRole: { role: string; count: number }[];
+  monthlyCostCents: number;
+  annualCostCents: number;
+  budgetLimitMonthlyCents?: number;
+  byRole: StaffRoleSummary[];
+  members?: StaffMember[];
   source: Source;
 }
 

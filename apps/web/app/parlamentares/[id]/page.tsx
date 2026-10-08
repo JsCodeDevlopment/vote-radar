@@ -301,7 +301,11 @@ function ProfileInner() {
             {p.stats.staffCount > 0 ? formatNumber(p.stats.staffCount) : '—'}
           </div>
           <span className="profile-kpi-subtext">
-            {p.stats.staffCount > 0 ? 'Servidores e assessores ativos →' : 'Consultar quadro de pessoal →'}
+            {p.stats.staffMonthlyCostCents
+              ? `${formatBRL(p.stats.staffMonthlyCostCents, true)}/mês à União →`
+              : p.stats.staffCount > 0
+              ? 'Servidores ativos em exercício →'
+              : 'Consultar quadro de pessoal →'}
           </span>
         </button>
       </div>
