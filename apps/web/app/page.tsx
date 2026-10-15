@@ -37,6 +37,9 @@ export default function HomePage() {
 
         <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
           <span className="text-xs font-mono text-muted-foreground mr-1">Filtros rápidos:</span>
+          <Link href="/gastos-uniao" className="v-btn -ghost -sm text-primary font-bold border border-primary/30">
+            🏛️ Gastos da União (R$ 5,5 Tri)
+          </Link>
           <Link href="/explorar?cargo=DEPUTADO_FEDERAL" className="v-btn -ghost -sm">
             Deputados Federais
           </Link>
