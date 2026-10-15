@@ -114,7 +114,7 @@ export function PoliticianCard({
           <div className="pol-card-subinfo">
             <span className="pol-badge-party">{politician.party ?? 'Sem Partido'}</span>
             <span>•</span>
-            <span className="truncate">{politician.uf ? `Representante de ${politician.uf}` : 'Âmbito Federal'}</span>
+            <span className="truncate">{politician.uf ? `Bancada ${politician.uf}` : 'Brasil'}</span>
           </div>
         </div>
       </div>
