@@ -563,6 +563,27 @@ export class RealDataService implements OnModuleInit {
         for (const p of updatedList) {
           uniqueMap.set(p.id, p);
         }
+        // Se alguma fonte (ex.: TSE) falhou nesta sincronização, preserva os registros já conhecidos
+        // (cache em disco / sincronização anterior) desse cargo, para nunca perder cargos da listagem.
+        const fetchedCountByOffice = new Map<string, number>();
+        for (const p of uniqueMap.values()) {
+          fetchedCountByOffice.set(p.office, (fetchedCountByOffice.get(p.office) ?? 0) + 1);
+        }
+        const previousByOffice = new Map<string, StoredPolitician[]>();
+        for (const p of this.politicians) {
+          const arr = previousByOffice.get(p.office) ?? [];
+          arr.push(p);
+          previousByOffice.set(p.office, arr);
+        }
+        for (const [office, prev] of previousByOffice) {
+          const fetched = fetchedCountByOffice.get(office) ?? 0;
+          // Cobertura incompleta (menos de 90% do que já tínhamos): completa com os registros anteriores
+          if (fetched < prev.length * 0.9) {
+            for (const p of prev) {
+              if (!uniqueMap.has(p.id)) uniqueMap.set(p.id, p);
+            }
+          }
+        }
         this.politicians = Array.from(uniqueMap.values());
         this.logger.log(`Sincronização oficial concluída com sucesso: ${this.politicians.length} autoridades públicas únicas carregadas (Presidente, Governadores, Senadores, Deputados Federais e Estaduais).`);
         this.saveToDiskCache();
