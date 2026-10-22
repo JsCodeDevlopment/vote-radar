@@ -36,7 +36,7 @@ import {
 
 const POPULAR_UFS = ['SP', 'RJ', 'MG', 'BA', 'RS', 'PR', 'PE', 'CE', 'DF', 'SC', 'GO'] as const;
 
-type OfficeFilter = 'ALL' | 'DEPUTADO_FEDERAL' | 'SENADOR' | 'GOVERNADOR' | 'PRESIDENTE';
+type OfficeFilter = 'ALL' | 'DEPUTADO_FEDERAL' | 'DEPUTADO_ESTADUAL' | 'SENADOR' | 'GOVERNADOR' | 'PRESIDENTE';
 type FeedFilter = 'ALL' | 'VOTE' | 'EXPENSE' | 'PROPOSAL' | 'NEWS';
 
 export default function HomePage() {
@@ -98,14 +98,17 @@ export default function HomePage() {
       const officeName =
         selectedOffice === 'DEPUTADO_FEDERAL'
           ? 'Deputados Federais'
-          : selectedOffice === 'SENADOR'
-            ? 'Senadores'
-            : selectedOffice === 'GOVERNADOR'
-              ? 'Governador'
-              : 'Parlamentares e Governantes';
+          : selectedOffice === 'DEPUTADO_ESTADUAL'
+            ? 'Deputados Estaduais'
+            : selectedOffice === 'SENADOR'
+              ? 'Senadores'
+              : selectedOffice === 'GOVERNADOR'
+                ? 'Governador'
+                : 'Parlamentares e Governantes';
       return `${officeName} de ${selectedUf}`;
     }
     if (selectedOffice === 'DEPUTADO_FEDERAL') return 'Deputados Federais em Exercício';
+    if (selectedOffice === 'DEPUTADO_ESTADUAL') return 'Deputados Estaduais em Exercício';
     if (selectedOffice === 'SENADOR') return 'Senadores da República em Exercício';
     if (selectedOffice === 'GOVERNADOR') return 'Governadores dos Estados Brasileiros';
     if (selectedOffice === 'PRESIDENTE') return 'Presidência da República';
@@ -198,6 +201,14 @@ export default function HomePage() {
             >
               <Users size={14} />
               Deputados Federais (513)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedOffice('DEPUTADO_ESTADUAL')}
+              className={`home-pill-filter ${selectedOffice === 'DEPUTADO_ESTADUAL' ? 'active' : ''}`}
+            >
+              <Landmark size={14} />
+              Deputados Estaduais (1.059)
             </button>
             <button
               type="button"

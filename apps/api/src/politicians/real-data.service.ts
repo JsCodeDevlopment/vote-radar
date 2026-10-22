@@ -1,4 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import type {
   AssetsResponse,
   Compatibility,
@@ -144,10 +146,59 @@ export class RealDataService implements OnModuleInit {
 
   private syncPromise: Promise<void> | null = null;
 
+  private getCacheFilePath(): string {
+    // Busca o arquivo de cache persistente em apps/api/src/data/politicians-cache.json
+    const candidatePaths = [
+      path.join(__dirname, '..', 'data', 'politicians-cache.json'),
+      path.join(__dirname, '..', '..', 'src', 'data', 'politicians-cache.json'),
+      path.join(process.cwd(), 'apps', 'api', 'src', 'data', 'politicians-cache.json'),
+      path.join(process.cwd(), 'src', 'data', 'politicians-cache.json'),
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) return p;
+    }
+    return candidatePaths[0];
+  }
+
+  private loadFromDiskCache() {
+    try {
+      const filePath = this.getCacheFilePath();
+      if (fs.existsSync(filePath)) {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          this.politicians = parsed;
+          const depEstCount = parsed.filter((p: any) => p.office === 'DEPUTADO_ESTADUAL').length;
+          this.logger.log(`Carregadas com sucesso ${parsed.length} autoridades públicas do cache em disco (${depEstCount} deputados estaduais).`);
+        }
+      }
+    } catch (err: any) {
+      this.logger.warn(`Não foi possível carregar cache pré-persistido: ${err?.message}`);
+    }
+  }
+
+  private saveToDiskCache() {
+    try {
+      const filePath = this.getCacheFilePath();
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, JSON.stringify(this.politicians, null, 2), 'utf-8');
+      this.logger.log(`Cache persistido em disco com sucesso (${this.politicians.length} autoridades públicas salvas).`);
+    } catch (err: any) {
+      this.logger.warn(`Falha ao salvar cache em disco: ${err?.message}`);
+    }
+  }
+
   onModuleInit() {
-    this.logger.log('Inicializando sincronização oficial em segundo plano...');
+    this.logger.log('Inicializando serviço de autoridades e parlamentares...');
+    // 1. Carrega imediatamente o cache pré-persistido (0ms de espera e 100% de deputados estaduais disponíveis)
+    this.loadFromDiskCache();
+
+    // 2. Dispara sincronização em segundo plano diretamente das fontes oficiais
     this.syncPromise = this.syncFromOfficialSources().catch((err) => {
-      this.logger.warn(`Erro na sincronização oficial inicial: ${err?.message}`);
+      this.logger.warn(`Erro na sincronização oficial em segundo plano: ${err?.message}`);
     });
   }
 
@@ -355,147 +406,153 @@ export class RealDataService implements OnModuleInit {
 
       // 4. Governadores de todos os 26 Estados e do Distrito Federal (TSE)
       try {
-        await Promise.allSettled(
-          BRAZIL_UFS.map(async (uf) => {
-            try {
-              const res = await fetch(
-                `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/3/candidatos`,
-                { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4000) },
-              );
-              if (res.ok) {
-                const data = (await res.json()) as any;
-                const elected = (data.candidatos || []).filter(
-                  (c: any) =>
-                    c.descricaoTotalizacao === 'Eleito' ||
-                    c.descricaoTotalizacao === 'Eleito por QP' ||
-                    c.descricaoTotalizacao === 'Eleito por média',
+        for (let i = 0; i < BRAZIL_UFS.length; i += 7) {
+          const chunk = BRAZIL_UFS.slice(i, i + 7);
+          await Promise.allSettled(
+            chunk.map(async (uf) => {
+              try {
+                const res = await fetch(
+                  `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/3/candidatos`,
+                  { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(12000) },
                 );
-                for (const c of elected) {
-                  const state = STATE_INFO[uf];
-                  const displayName = formatTitleCase(c.nomeUrna || c.nomeCompleto);
-                  const civil = formatTitleCase(c.nomeCompleto || c.nomeUrna);
-                  const photo = `https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/${TSE_ELECTION_ID}/${c.id}/${uf}`;
-                  const tseUrl = buildTseCandidateUrl(String(c.id), uf);
+                if (res.ok) {
+                  const data = (await res.json()) as any;
+                  const elected = (data.candidatos || []).filter(
+                    (c: any) =>
+                      c.descricaoTotalizacao === 'Eleito' ||
+                      c.descricaoTotalizacao === 'Eleito por QP' ||
+                      c.descricaoTotalizacao === 'Eleito por média',
+                  );
+                  for (const c of elected) {
+                    const state = STATE_INFO[uf];
+                    const displayName = formatTitleCase(c.nomeUrna || c.nomeCompleto);
+                    const civil = formatTitleCase(c.nomeCompleto || c.nomeUrna);
+                    const photo = `https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/${TSE_ELECTION_ID}/${c.id}/${uf}`;
+                    const tseUrl = buildTseCandidateUrl(String(c.id), uf);
 
-                  updatedList.push({
-                    id: `gov-${c.id}`,
-                    externalId: String(c.id),
-                    name: displayName,
-                    civilName: civil,
-                    photoUrl: photo,
-                    party: c.partido?.sigla || null,
-                    uf,
-                    office: 'GOVERNADOR',
-                    status: 'IN_OFFICE',
-                    bodyName: state ? state.govBody : `Governo do Estado (${uf})`,
-                    email: null,
-                    birthDate: null,
-                    termStart: '2023-01-01T00:00:00.000Z',
-                    termEnd: '2027-01-01T00:00:00.000Z',
-                    stats: {
-                      authoredProposals: 0,
-                      votings: 0,
-                      presence: null,
-                      expensesCents: 0,
-                      staffCount: 0,
-                    },
-                    recent30d: {
-                      votings: 0,
-                      proposalsMoved: 0,
-                      newProposals: 0,
-                      expensesCents: 0,
-                    },
-                    source: {
-                      id: `src:tse:gov:${c.id}`,
-                      type: 'OFFICIAL',
-                      name: 'Tribunal Superior Eleitoral (TSE)',
-                      publisher: 'DivulgaCandContas / Dados Abertos do TSE',
-                      url: tseUrl,
-                      retrievedAt: now,
-                    },
-                    updatedAt: now,
-                  });
+                    updatedList.push({
+                      id: `gov-${c.id}`,
+                      externalId: String(c.id),
+                      name: displayName,
+                      civilName: civil,
+                      photoUrl: photo,
+                      party: c.partido?.sigla || null,
+                      uf,
+                      office: 'GOVERNADOR',
+                      status: 'IN_OFFICE',
+                      bodyName: state ? state.govBody : `Governo do Estado (${uf})`,
+                      email: null,
+                      birthDate: null,
+                      termStart: '2023-01-01T00:00:00.000Z',
+                      termEnd: '2027-01-01T00:00:00.000Z',
+                      stats: {
+                        authoredProposals: 0,
+                        votings: 0,
+                        presence: null,
+                        expensesCents: 0,
+                        staffCount: 0,
+                      },
+                      recent30d: {
+                        votings: 0,
+                        proposalsMoved: 0,
+                        newProposals: 0,
+                        expensesCents: 0,
+                      },
+                      source: {
+                        id: `src:tse:gov:${c.id}`,
+                        type: 'OFFICIAL',
+                        name: 'Tribunal Superior Eleitoral (TSE)',
+                        publisher: 'DivulgaCandContas / Dados Abertos do TSE',
+                        url: tseUrl,
+                        retrievedAt: now,
+                      },
+                      updatedAt: now,
+                    });
+                  }
                 }
+              } catch (err: any) {
+                this.logger.warn(`Erro ao sincronizar Governador de ${uf}: ${err?.message}`);
               }
-            } catch (err: any) {
-              this.logger.warn(`Erro ao sincronizar Governador de ${uf}: ${err?.message}`);
-            }
-          }),
-        );
+            }),
+          );
+        }
       } catch (err: any) {
         this.logger.warn(`Erro geral ao sincronizar Governadores: ${err?.message}`);
       }
 
       // 5. Deputados Estaduais e Distritais (TSE — Todas as 27 Assembleias Legislativas e CLDF)
       try {
-        await Promise.allSettled(
-          BRAZIL_UFS.map(async (uf) => {
-            const cargo = uf === 'DF' ? '8' : '7';
-            try {
-              const res = await fetch(
-                `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/${cargo}/candidatos`,
-                { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4000) },
-              );
-              if (res.ok) {
-                const data = (await res.json()) as any;
-                const elected = (data.candidatos || []).filter(
-                  (c: any) =>
-                    c.descricaoTotalizacao === 'Eleito' ||
-                    c.descricaoTotalizacao === 'Eleito por QP' ||
-                    c.descricaoTotalizacao === 'Eleito por média',
+        for (let i = 0; i < BRAZIL_UFS.length; i += 7) {
+          const chunk = BRAZIL_UFS.slice(i, i + 7);
+          await Promise.allSettled(
+            chunk.map(async (uf) => {
+              const cargo = uf === 'DF' ? '8' : '7';
+              try {
+                const res = await fetch(
+                  `${TSE_API}/candidatura/listar/2022/${uf}/${TSE_ELECTION_ID}/${cargo}/candidatos`,
+                  { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(12000) },
                 );
-                for (const c of elected) {
-                  const state = STATE_INFO[uf];
-                  const displayName = formatTitleCase(c.nomeUrna || c.nomeCompleto);
-                  const civil = formatTitleCase(c.nomeCompleto || c.nomeUrna);
-                  const photo = `https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/${TSE_ELECTION_ID}/${c.id}/${uf}`;
-                  const tseUrl = buildTseCandidateUrl(String(c.id), uf);
+                if (res.ok) {
+                  const data = (await res.json()) as any;
+                  const elected = (data.candidatos || []).filter(
+                    (c: any) =>
+                      c.descricaoTotalizacao === 'Eleito' ||
+                      c.descricaoTotalizacao === 'Eleito por QP' ||
+                      c.descricaoTotalizacao === 'Eleito por média',
+                  );
+                  for (const c of elected) {
+                    const state = STATE_INFO[uf];
+                    const displayName = formatTitleCase(c.nomeUrna || c.nomeCompleto);
+                    const civil = formatTitleCase(c.nomeCompleto || c.nomeUrna);
+                    const photo = `https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/${TSE_ELECTION_ID}/${c.id}/${uf}`;
+                    const tseUrl = buildTseCandidateUrl(String(c.id), uf);
 
-                  updatedList.push({
-                    id: `depest-${c.id}`,
-                    externalId: String(c.id),
-                    name: displayName,
-                    civilName: civil,
-                    photoUrl: photo,
-                    party: c.partido?.sigla || null,
-                    uf,
-                    office: 'DEPUTADO_ESTADUAL',
-                    status: 'IN_OFFICE',
-                    bodyName: state ? state.assemblyName : `Assembleia Legislativa (${uf})`,
-                    email: null,
-                    birthDate: null,
-                    termStart: '2023-02-01T00:00:00.000Z',
-                    termEnd: '2027-01-31T00:00:00.000Z',
-                    stats: {
-                      authoredProposals: 0,
-                      votings: 0,
-                      presence: null,
-                      expensesCents: 0,
-                      staffCount: 0,
-                    },
-                    recent30d: {
-                      votings: 0,
-                      proposalsMoved: 0,
-                      newProposals: 0,
-                      expensesCents: 0,
-                    },
-                    source: {
-                      id: `src:tse:depest:${c.id}`,
-                      type: 'OFFICIAL',
-                      name: 'Tribunal Superior Eleitoral (TSE)',
-                      publisher: 'DivulgaCandContas / Dados Abertos do TSE',
-                      url: tseUrl,
-                      retrievedAt: now,
-                    },
-                    updatedAt: now,
-                  });
+                    updatedList.push({
+                      id: `depest-${c.id}`,
+                      externalId: String(c.id),
+                      name: displayName,
+                      civilName: civil,
+                      photoUrl: photo,
+                      party: c.partido?.sigla || null,
+                      uf,
+                      office: 'DEPUTADO_ESTADUAL',
+                      status: 'IN_OFFICE',
+                      bodyName: state ? state.assemblyName : `Assembleia Legislativa (${uf})`,
+                      email: null,
+                      birthDate: null,
+                      termStart: '2023-02-01T00:00:00.000Z',
+                      termEnd: '2027-01-31T00:00:00.000Z',
+                      stats: {
+                        authoredProposals: 0,
+                        votings: 0,
+                        presence: null,
+                        expensesCents: 0,
+                        staffCount: 0,
+                      },
+                      recent30d: {
+                        votings: 0,
+                        proposalsMoved: 0,
+                        newProposals: 0,
+                        expensesCents: 0,
+                      },
+                      source: {
+                        id: `src:tse:depest:${c.id}`,
+                        type: 'OFFICIAL',
+                        name: 'Tribunal Superior Eleitoral (TSE)',
+                        publisher: 'DivulgaCandContas / Dados Abertos do TSE',
+                        url: tseUrl,
+                        retrievedAt: now,
+                      },
+                      updatedAt: now,
+                    });
+                  }
                 }
+              } catch (err: any) {
+                this.logger.warn(`Erro ao sincronizar Deputados Estaduais de ${uf}: ${err?.message}`);
               }
-            } catch (err: any) {
-              this.logger.warn(`Erro ao sincronizar Deputados Estaduais de ${uf}: ${err?.message}`);
-            }
-          }),
-        );
+            }),
+          );
+        }
       } catch (err: any) {
         this.logger.warn(`Erro geral ao sincronizar Deputados Estaduais: ${err?.message}`);
       }
@@ -508,6 +565,7 @@ export class RealDataService implements OnModuleInit {
         }
         this.politicians = Array.from(uniqueMap.values());
         this.logger.log(`Sincronização oficial concluída com sucesso: ${this.politicians.length} autoridades públicas únicas carregadas (Presidente, Governadores, Senadores, Deputados Federais e Estaduais).`);
+        this.saveToDiskCache();
       }
     } finally {
       this.isFetching = false;
@@ -525,10 +583,13 @@ export class RealDataService implements OnModuleInit {
     pageSize?: number;
   }): Promise<Paginated<PoliticianSummary>> {
     if (this.politicians.length === 0) {
+      this.loadFromDiskCache();
+    }
+    if (this.politicians.length === 0) {
       if (this.syncPromise) {
         await Promise.race([
           this.syncPromise,
-          new Promise((resolve) => setTimeout(resolve, 3500)),
+          new Promise((resolve) => setTimeout(resolve, 8000)),
         ]);
       } else {
         await this.syncFromOfficialSources();
@@ -608,10 +669,13 @@ export class RealDataService implements OnModuleInit {
 
   async listParties(): Promise<string[]> {
     if (this.politicians.length === 0) {
+      this.loadFromDiskCache();
+    }
+    if (this.politicians.length === 0) {
       if (this.syncPromise) {
         await Promise.race([
           this.syncPromise,
-          new Promise((resolve) => setTimeout(resolve, 3500)),
+          new Promise((resolve) => setTimeout(resolve, 8000)),
         ]);
       } else {
         await this.syncFromOfficialSources();
@@ -632,6 +696,9 @@ export class RealDataService implements OnModuleInit {
     const cached = this.getFromCache<PoliticianDetail>(cacheKey);
     if (cached) return cached;
 
+    if (this.politicians.length === 0) {
+      this.loadFromDiskCache();
+    }
     if (this.politicians.length === 0) {
       await this.syncFromOfficialSources();
     }

@@ -8,7 +8,7 @@ import { useAuth } from './AuthProvider';
 import { Menu, X, Compass, Scale, Building2, Megaphone, LogIn, UserPlus, LogOut, User as UserIcon, Landmark } from 'lucide-react';
 
 const NAV = [
-  { href: '/explorar', label: 'Explorar', icon: Compass, description: 'Parlamentares, Governadores e Presidente' },
+  { href: '/explorar', label: 'Explorar', icon: Compass, description: 'Deputados federais e estaduais, senadores e governantes' },
   { href: '/gastos-uniao', label: 'Gastos da União', icon: Landmark, description: 'Raio-X de todo o orçamento e despesas federais' },
   // Opções temporariamente comentadas a pedido do usuário:
   // { href: '/politicas', label: 'Políticas', icon: Scale, description: 'Seu alinhamento com temas e votações' },

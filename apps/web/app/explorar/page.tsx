@@ -104,6 +104,55 @@ function ExploreInner() {
         </p>
       </div>
 
+      {/* Filtros Rápidos de Cargo */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="text-xs font-mono text-muted-foreground mr-1 hidden sm:inline">
+          Filtrar cargo:
+        </span>
+        <button
+          type="button"
+          onClick={() => update({ cargo: '' })}
+          className={`v-btn -sm ${!office ? '-accent font-bold' : '-ghost'}`}
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ cargo: 'DEPUTADO_FEDERAL' })}
+          className={`v-btn -sm ${office === 'DEPUTADO_FEDERAL' ? '-accent font-bold' : '-ghost'}`}
+        >
+          Deputados Federais (513)
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ cargo: 'DEPUTADO_ESTADUAL' })}
+          className={`v-btn -sm ${office === 'DEPUTADO_ESTADUAL' ? '-accent font-bold' : '-ghost'}`}
+        >
+          Deputados Estaduais (1.059)
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ cargo: 'SENADOR' })}
+          className={`v-btn -sm ${office === 'SENADOR' ? '-accent font-bold' : '-ghost'}`}
+        >
+          Senadores (81)
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ cargo: 'GOVERNADOR' })}
+          className={`v-btn -sm ${office === 'GOVERNADOR' ? '-accent font-bold' : '-ghost'}`}
+        >
+          Governadores (27)
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ cargo: 'PRESIDENTE' })}
+          className={`v-btn -sm ${office === 'PRESIDENTE' ? '-accent font-bold' : '-ghost'}`}
+        >
+          Presidência
+        </button>
+      </div>
+
       {/* Barra de Busca Principal e Filtros Rápidos */}
       <form
         className="v-card p-4 mb-6 flex flex-wrap gap-3 items-center"
