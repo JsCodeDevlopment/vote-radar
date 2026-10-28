@@ -36,11 +36,73 @@ export async function getDataMode(): Promise<'api'> {
   return 'api';
 }
 
-// ───────── http ─────────
+// ───────── http e cache de 1 dia para perfis ─────────
+
+const CLIENT_CACHE_KEY_PREFIX = 'pt:cache:1d:';
+
+interface ClientCacheEntry<T> {
+  data: T;
+  dateStr: string;
+  expiresAt: number;
+}
+
+const memoryClientCache = new Map<string, ClientCacheEntry<any>>();
+
+function getTodayString(): string {
+  const d = new Date();
+  const utc = d.getTime() + d.getTimezoneOffset() * 60000;
+  const brt = new Date(utc - 3 * 3600000);
+  return brt.toISOString().slice(0, 10);
+}
+
+function isEligibleForDailyProfileCache(path: string, init: RequestInit = {}): boolean {
+  const method = (init.method || 'GET').toUpperCase();
+  if (method !== 'GET') return false;
+
+  // A aba de notícias é volátil e não deve receber cache de 1 dia
+  if (path.includes('/news')) return false;
+
+  // Rotas que compõem o perfil dos políticos
+  if (
+    path.startsWith('/politicians') ||
+    path.startsWith('/parties') ||
+    path.startsWith('/proposals')
+  ) {
+    return true;
+  }
+  return false;
+}
 
 async function http<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const eligible = isEligibleForDailyProfileCache(cleanPath, init);
+  const today = getTodayString();
+  const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+  const cacheKey = token && cleanPath.includes('compatibility') ? `${cleanPath}:tok` : cleanPath;
+
+  // 1. Tenta recuperar do cache de 1 dia no cliente
+  if (eligible) {
+    const mem = memoryClientCache.get(cacheKey);
+    if (mem && mem.dateStr === today && Date.now() < mem.expiresAt) {
+      return mem.data as T;
+    }
+
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem(`${CLIENT_CACHE_KEY_PREFIX}${cacheKey}`);
+        if (raw) {
+          const parsed = JSON.parse(raw) as ClientCacheEntry<T>;
+          if (parsed && parsed.dateStr === today && Date.now() < parsed.expiresAt) {
+            memoryClientCache.set(cacheKey, parsed);
+            return parsed.data;
+          } else {
+            sessionStorage.removeItem(`${CLIENT_CACHE_KEY_PREFIX}${cacheKey}`);
+          }
+        }
+      } catch {}
+    }
+  }
+
   const fullUrl = `${API_URL}${cleanPath}`;
   const res = await fetch(fullUrl, {
     ...init,
@@ -61,7 +123,24 @@ async function http<T>(path: string, init: RequestInit = {}): Promise<T> {
     throw new ApiError(res.status, message);
   }
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  const data = (await res.json()) as T;
+
+  // 2. Salva no cache de 1 dia do cliente se elegível
+  if (eligible) {
+    const entry: ClientCacheEntry<T> = {
+      data,
+      dateStr: today,
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+    };
+    memoryClientCache.set(cacheKey, entry);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem(`${CLIENT_CACHE_KEY_PREFIX}${cacheKey}`, JSON.stringify(entry));
+      } catch {}
+    }
+  }
+
+  return data;
 }
 
 function qs(params: Record<string, string | number | undefined | null>): string {

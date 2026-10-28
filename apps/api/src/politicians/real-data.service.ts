@@ -118,6 +118,27 @@ function formatTitleCase(str: string): string {
     .join(' ');
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000; // Cache de 1 dia para dados consolidados do perfil
+const NEWS_CACHE_MS = 10 * 60 * 1000;   // Cache volátil de 10 min para aba de notícias
+
+function getTodayDateString(): string {
+  const d = new Date();
+  const utc = d.getTime() + d.getTimezoneOffset() * 60000;
+  const brt = new Date(utc - 3 * 3600000);
+  return brt.toISOString().slice(0, 10);
+}
+
+function getMsUntilTomorrow(): number {
+  const d = new Date();
+  const utc = d.getTime() + d.getTimezoneOffset() * 60000;
+  const brt = new Date(utc - 3 * 3600000);
+  const tomorrow = new Date(brt);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const diff = tomorrow.getTime() - brt.getTime();
+  return Math.max(1000, diff);
+}
+
 interface StoredPolitician extends PoliticianDetail {
   externalId: string;
 }
@@ -127,12 +148,28 @@ export class RealDataService implements OnModuleInit {
   private readonly logger = new Logger(RealDataService.name);
   private politicians: StoredPolitician[] = [];
   private isFetching = false;
-  private cache = new Map<string, { data: any; expiry: number }>();
+  private cache = new Map<string, { data: any; expiry: number; cachedDate?: string }>();
   private proposalCache = new Map<string, ProposalDetail>();
+  private profileDiskCache = new Map<string, any>();
+  private saveProfileDiskCacheTimeout: NodeJS.Timeout | null = null;
+  private dailyScheduleTimer: NodeJS.Timeout | null = null;
+  private lastDailySyncDate: string | null = null;
+  private syncPromise: Promise<void> | null = null;
 
   private getFromCache<T>(key: string): T | null {
     const item = this.cache.get(key);
-    if (!item) return null;
+    if (!item) {
+      // Se não estiver em memória, tenta recuperar do cache em disco de hoje (apenas perfis, notícias não persistem)
+      if (!key.startsWith('news:') && this.profileDiskCache.has(key)) {
+        const diskItem = this.profileDiskCache.get(key);
+        const today = getTodayDateString();
+        if (diskItem && diskItem.cachedDate === today) {
+          this.cache.set(key, { data: diskItem.data, expiry: Date.now() + ONE_DAY_MS, cachedDate: diskItem.cachedDate });
+          return diskItem.data as T;
+        }
+      }
+      return null;
+    }
     if (Date.now() > item.expiry) {
       this.cache.delete(key);
       return null;
@@ -140,11 +177,16 @@ export class RealDataService implements OnModuleInit {
     return item.data as T;
   }
 
-  private setInCache<T>(key: string, data: T, ttlMs = 10 * 60 * 1000) {
-    this.cache.set(key, { data, expiry: Date.now() + ttlMs });
-  }
+  private setInCache<T>(key: string, data: T, ttlMs = ONE_DAY_MS) {
+    const today = getTodayDateString();
+    this.cache.set(key, { data, expiry: Date.now() + ttlMs, cachedDate: today });
 
-  private syncPromise: Promise<void> | null = null;
+    // Salva em disco dados de perfil para persistirem com cache de 1 dia (notícias permanecem voláteis)
+    if (!key.startsWith('news:') && ttlMs >= ONE_DAY_MS) {
+      this.profileDiskCache.set(key, { data, cachedDate: today });
+      this.scheduleSaveProfileDiskCache();
+    }
+  }
 
   private getCacheFilePath(): string {
     // Busca o arquivo de cache persistente em apps/api/src/data/politicians-cache.json
@@ -158,6 +200,124 @@ export class RealDataService implements OnModuleInit {
       if (fs.existsSync(p)) return p;
     }
     return candidatePaths[0];
+  }
+
+  private getProfileCacheFilePath(): string {
+    const mainCache = this.getCacheFilePath();
+    return path.join(path.dirname(mainCache), 'politicians-profile-cache.json');
+  }
+
+  private getMetaFilePath(): string {
+    const mainCache = this.getCacheFilePath();
+    return path.join(path.dirname(mainCache), 'daily-sync-meta.json');
+  }
+
+  private scheduleSaveProfileDiskCache() {
+    if (this.saveProfileDiskCacheTimeout) return;
+    this.saveProfileDiskCacheTimeout = setTimeout(() => {
+      this.saveProfileDiskCache();
+      this.saveProfileDiskCacheTimeout = null;
+    }, 2000);
+  }
+
+  private saveProfileDiskCache() {
+    try {
+      const filePath = this.getProfileCacheFilePath();
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      const obj: Record<string, any> = {};
+      const today = getTodayDateString();
+      for (const [k, v] of this.profileDiskCache.entries()) {
+        if (v && v.cachedDate === today) {
+          obj[k] = v;
+        }
+      }
+      fs.writeFileSync(filePath, JSON.stringify({ date: today, entries: obj }), 'utf-8');
+    } catch (err: any) {
+      this.logger.warn(`Falha ao salvar cache de perfis em disco: ${err?.message}`);
+    }
+  }
+
+  private loadProfileDiskCache() {
+    try {
+      const filePath = this.getProfileCacheFilePath();
+      if (fs.existsSync(filePath)) {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        const today = getTodayDateString();
+        if (parsed && parsed.date === today && parsed.entries) {
+          for (const [k, v] of Object.entries(parsed.entries)) {
+            this.profileDiskCache.set(k, v);
+          }
+          this.logger.log(`Carregados ${Object.keys(parsed.entries).length} dados de perfis do cache persistido de hoje (${today}).`);
+        }
+      }
+    } catch (err: any) {
+      this.logger.warn(`Não foi possível carregar cache de perfis em disco: ${err?.message}`);
+    }
+  }
+
+  private loadDailySyncMeta(): { lastDailySyncDate?: string } | null {
+    try {
+      const filePath = this.getMetaFilePath();
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      }
+    } catch {}
+    return null;
+  }
+
+  private saveDailySyncMeta(dateStr: string) {
+    try {
+      const filePath = this.getMetaFilePath();
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify({ lastDailySyncDate: dateStr, timestamp: Date.now() }, null, 2), 'utf-8');
+      this.lastDailySyncDate = dateStr;
+    } catch (err: any) {
+      this.logger.warn(`Falha ao salvar metadados de sincronização diária: ${err?.message}`);
+    }
+  }
+
+  private clearDailyProfileCache() {
+    for (const [key] of this.cache.entries()) {
+      if (!key.startsWith('news:')) {
+        this.cache.delete(key);
+      }
+    }
+    this.profileDiskCache.clear();
+    try {
+      const filePath = this.getProfileCacheFilePath();
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch {}
+  }
+
+  private scheduleStartOfDayFetch() {
+    if (this.dailyScheduleTimer) {
+      clearTimeout(this.dailyScheduleTimer);
+      this.dailyScheduleTimer = null;
+    }
+
+    const msUntilTomorrow = getMsUntilTomorrow();
+    const nextRunDate = new Date(Date.now() + msUntilTomorrow);
+    this.logger.log(
+      `[Cache 1D] Próximo fetch oficial no início do dia programado para: ${nextRunDate.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })} (em ${(msUntilTomorrow / 3600000).toFixed(1)}h)`,
+    );
+
+    this.dailyScheduleTimer = setTimeout(async () => {
+      try {
+        const newToday = getTodayDateString();
+        this.logger.log(`[Cache 1D] Início do dia atingido (${newToday})! Disparando busca oficial de todos os políticos...`);
+        this.clearDailyProfileCache();
+        await this.syncFromOfficialSources();
+        this.saveDailySyncMeta(newToday);
+        this.logger.log(`[Cache 1D] Busca no início do dia concluída com sucesso para ${newToday}.`);
+      } catch (err: any) {
+        this.logger.error(`[Cache 1D] Erro na busca do início do dia: ${err?.message}`);
+      } finally {
+        this.scheduleStartOfDayFetch();
+      }
+    }, msUntilTomorrow);
   }
 
   private loadFromDiskCache() {
@@ -192,14 +352,31 @@ export class RealDataService implements OnModuleInit {
   }
 
   onModuleInit() {
-    this.logger.log('Inicializando serviço de autoridades e parlamentares...');
-    // 1. Carrega imediatamente o cache pré-persistido (0ms de espera e 100% de deputados estaduais disponíveis)
+    this.logger.log('Inicializando serviço de autoridades e parlamentares com cache de 1 dia...');
+    // 1. Carrega imediatamente o cache pré-persistido de autoridades (0ms de espera)
     this.loadFromDiskCache();
+    // 2. Carrega o cache persistido de perfis do dia
+    this.loadProfileDiskCache();
 
-    // 2. Dispara sincronização em segundo plano diretamente das fontes oficiais
-    this.syncPromise = this.syncFromOfficialSources().catch((err) => {
-      this.logger.warn(`Erro na sincronização oficial em segundo plano: ${err?.message}`);
-    });
+    const today = getTodayDateString();
+    const meta = this.loadDailySyncMeta();
+    this.lastDailySyncDate = meta?.lastDailySyncDate || null;
+
+    if (this.lastDailySyncDate === today && this.politicians.length > 0) {
+      this.logger.log(`[Cache 1D] Busca oficial do início do dia já realizada hoje (${today}). Utilizando cache de 1 dia para todos os perfis.`);
+    } else {
+      this.logger.log(`[Cache 1D] Novo dia detectado ou primeira execução hoje (${today}). Disparando fetch de parlamentares no início do dia...`);
+      this.syncPromise = this.syncFromOfficialSources()
+        .then(() => {
+          this.saveDailySyncMeta(today);
+        })
+        .catch((err) => {
+          this.logger.warn(`Erro na busca oficial do início do dia: ${err?.message}`);
+        });
+    }
+
+    // 3. Agenda o fetch no início do próximo dia (00:00:00 BRT)
+    this.scheduleStartOfDayFetch();
   }
 
   /**
@@ -587,6 +764,7 @@ export class RealDataService implements OnModuleInit {
         this.politicians = Array.from(uniqueMap.values());
         this.logger.log(`Sincronização oficial concluída com sucesso: ${this.politicians.length} autoridades públicas únicas carregadas (Presidente, Governadores, Senadores, Deputados Federais e Estaduais).`);
         this.saveToDiskCache();
+        this.saveDailySyncMeta(getTodayDateString());
       }
     } finally {
       this.isFetching = false;
@@ -1025,7 +1203,7 @@ export class RealDataService implements OnModuleInit {
     }
 
     politicianDetail.updatedAt = new Date().toISOString();
-    this.setInCache(cacheKey, politicianDetail, 5 * 60 * 1000);
+    this.setInCache(cacheKey, politicianDetail, ONE_DAY_MS);
     return politicianDetail;
   }
 
@@ -3226,9 +3404,18 @@ export class RealDataService implements OnModuleInit {
    * Obtém a composição de servidores do gabinete diretamente das páginas oficiais de transparência.
    */
   async getStaff(politicianId: string): Promise<StaffResponse> {
+    const cacheKey = `staff:${politicianId}`;
+    const cached = this.getFromCache<StaffResponse>(cacheKey);
+    if (cached) return cached;
+
+    const saveAndReturn = (result: StaffResponse): StaffResponse => {
+      this.setInCache(cacheKey, result, ONE_DAY_MS);
+      return result;
+    };
+
     const p = this.politicians.find((x) => x.id === politicianId) || (await this.getPolitician(politicianId));
     if (!p) {
-      return {
+      return saveAndReturn({
         total: 0,
         monthlyCostCents: 0,
         annualCostCents: 0,
@@ -3240,7 +3427,7 @@ export class RealDataService implements OnModuleInit {
           url: 'https://dadosabertos.camara.leg.br',
           retrievedAt: new Date().toISOString(),
         },
-      };
+      });
     }
 
     // 1. Deputado Federal (Câmara dos Deputados — Quadro Oficial de Pessoal e Verba de Gabinete)
@@ -3319,7 +3506,7 @@ export class RealDataService implements OnModuleInit {
               // Custo anual projetado: 13,333 salários base (inclui 13º e férias) + 12 meses de auxílio alimentação
               const annualCostCents = Math.round((totalBaseSalary * 13.3333 + members.length * AUXILIO_CAMARA * 12) * 100);
 
-              return {
+              return saveAndReturn({
                 total: members.length,
                 monthlyCostCents: totalMonthlyCents,
                 annualCostCents,
@@ -3334,7 +3521,7 @@ export class RealDataService implements OnModuleInit {
                   url: staffUrl,
                   retrievedAt: new Date().toISOString(),
                 },
-              };
+              });
             }
           }
         }
@@ -3436,7 +3623,7 @@ export class RealDataService implements OnModuleInit {
 
             const annualCostCents = Math.round((totalBaseSalary * 13.3333 + members.length * AUXILIO_SENADO * 12) * 100);
 
-            return {
+            return saveAndReturn({
               total: members.length,
               monthlyCostCents: totalMonthlyCents,
               annualCostCents,
@@ -3451,7 +3638,7 @@ export class RealDataService implements OnModuleInit {
                 url: `https://www25.senado.leg.br/web/senadores/senador/-/perfil/${p.externalId}`,
                 retrievedAt: new Date().toISOString(),
               },
-            };
+            });
           }
         }
       } catch (err: any) {
@@ -3482,7 +3669,7 @@ export class RealDataService implements OnModuleInit {
         { role: `Gabinete do Vice-Governador — ${viceName}`, count: 1, monthlyCostCents: 4500000, annualCostCents: 60000000 },
       ];
 
-      return {
+      return saveAndReturn({
         total: 12,
         monthlyCostCents: 28000000,
         annualCostCents: 373300000,
@@ -3496,7 +3683,7 @@ export class RealDataService implements OnModuleInit {
           url: state?.govPortal || 'https://www.transparencia.sp.gov.br',
           retrievedAt: new Date().toISOString(),
         },
-      };
+      });
     }
 
     // 4. Deputado Estadual
@@ -3507,7 +3694,7 @@ export class RealDataService implements OnModuleInit {
         { role: 'Chefia de Gabinete Parlamentar', count: 1, monthlyCostCents: 1300000, annualCostCents: 17300000 },
       ];
 
-      return {
+      return saveAndReturn({
         total: 15,
         monthlyCostCents: 9800000,
         annualCostCents: 130600000,
@@ -3521,7 +3708,7 @@ export class RealDataService implements OnModuleInit {
           url: state?.assemblyUrl || 'https://www.al.sp.gov.br',
           retrievedAt: new Date().toISOString(),
         },
-      };
+      });
     }
 
     // 5. Presidente da República
@@ -3545,7 +3732,7 @@ export class RealDataService implements OnModuleInit {
         { role: 'Gabinete Pessoal e Cerimonial da Presidência', count: 6, monthlyCostCents: 11000000, annualCostCents: 146600000 },
         { role: `Gabinete do Vice-Presidente da República — ${viceName}`, count: 3, monthlyCostCents: 8000000, annualCostCents: 106800000 },
       ];
-      return {
+      return saveAndReturn({
         total: 21,
         monthlyCostCents: 45000000,
         annualCostCents: 600000000,
@@ -3559,10 +3746,10 @@ export class RealDataService implements OnModuleInit {
           url: 'https://www.gov.br/secretariageral/pt-br/composicao',
           retrievedAt: new Date().toISOString(),
         },
-      };
+      });
     }
 
-    return {
+    return saveAndReturn({
       total: 0,
       monthlyCostCents: 0,
       annualCostCents: 0,
@@ -3575,7 +3762,7 @@ export class RealDataService implements OnModuleInit {
         url: p.source.url,
         retrievedAt: new Date().toISOString(),
       },
-    };
+    });
   }
 
   /**
@@ -3639,7 +3826,7 @@ export class RealDataService implements OnModuleInit {
       this.logger.warn(`Erro ao buscar notícias do Google News RSS: ${err?.message}`);
     }
 
-    this.setInCache(cacheKey, newsArticles);
+    this.setInCache(cacheKey, newsArticles, NEWS_CACHE_MS);
     return newsArticles;
   }
 
