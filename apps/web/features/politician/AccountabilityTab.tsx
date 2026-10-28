@@ -117,7 +117,6 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1.5 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xl">📢</span>
               <h2 className="text-lg font-mono font-bold text-foreground">
                 Como Cobrar este Mandato — Controle Social Cidadão
               </h2>
@@ -133,11 +132,11 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
           </div>
 
           <div className="flex items-center gap-2 flex-wrap text-xs font-mono text-muted-foreground bg-background/60 p-2.5 rounded-lg border border-border">
-            <span>📊 Gastos: {formatBRL(p.stats.expensesCents, true)}</span>
+            <span>Gastos: {formatBRL(p.stats.expensesCents, true)}</span>
             <span>·</span>
-            <span>🗳️ {formatNumber(p.stats.votings)} votos</span>
+            <span>{formatNumber(p.stats.votings)} votos</span>
             <span>·</span>
-            <span>👥 {p.stats.staffCount} servidores</span>
+            <span>{p.stats.staffCount} servidores</span>
           </div>
         </div>
       </div>
@@ -268,7 +267,6 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
         <div>
           <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
             <div className="flex items-center gap-2">
-              <span className="text-lg">✍️</span>
               <h3 className="text-base font-mono font-bold text-foreground uppercase tracking-wider">
                 Gerador de Mensagens e Modelos de Cobrança
               </h3>
@@ -300,8 +298,7 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
                     : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{tmpl.icon}</span>
+                <div className="mb-1">
                   <strong className="text-xs font-mono font-bold truncate block">
                     {tmpl.title}
                   </strong>
@@ -451,7 +448,6 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
                   <span className="text-xs font-mono font-bold text-primary uppercase tracking-wider">
                     Passo 0{step.step}
                   </span>
-                  <span className="text-xl">{step.icon}</span>
                 </div>
 
                 <h4 className="text-sm font-mono font-bold text-foreground">
@@ -473,7 +469,6 @@ export function AccountabilityTab({ politician: p }: { politician: PoliticianDet
 
               {step.tip && (
                 <div className="p-2.5 rounded-lg bg-background/80 border border-border text-[11px] font-mono text-muted-foreground flex items-start gap-2 mt-2">
-                  <span className="text-primary font-bold">💡</span>
                   <span>{step.tip}</span>
                 </div>
               )}

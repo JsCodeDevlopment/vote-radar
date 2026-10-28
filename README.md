@@ -108,3 +108,11 @@ Se já possuir um serviço local do PostgreSQL (ex.: porta `5433`):
 | `/politicas` | **Minhas Políticas Públicas**: Posicionamento privado por temas (Economia, Tributação, Saúde, Educação, Segurança, etc.). |
 | `/dashboard` | **Meu Painel**: Compatibilidade média com seus deputados, contadores de atividades e feed exclusivo dos parlamentares que você segue. |
 | `/login` e `/register` | **Autenticação**: Cadastro e login de cidadãos com foco em privacidade (LGPD). |
+
+---
+
+## 📚 Documentação e Negócios
+
+- [Mapeamento de Fontes e Dados (SOURCE_MAP.md)](file:///c:/Users/PC/Documents/Jonatas/politica-tracker/docs/SOURCE_MAP.md)
+- [Plano de Negócios e Estratégia de Monetização (PLANO_MONETIZACAO_E_ESTRATEGIA.md)](file:///c:/Users/PC/Documents/Jonatas/politica-tracker/docs/PLANO_MONETIZACAO_E_ESTRATEGIA.md)
+

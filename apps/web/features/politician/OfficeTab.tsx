@@ -87,7 +87,7 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="row between">
           <div>
             <span className="card-title">Competências Oficiais</span>
-            <h2>💼 O que este cargo faz na prática?</h2>
+            <h2>O que este cargo faz na prática?</h2>
           </div>
           <span className="chip chip-green">Atribuições Constitucionais</span>
         </div>
@@ -98,7 +98,6 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="office-grid-duties">
           {duty.whatItDoes.map((item, idx) => (
             <div key={idx} className="office-duty-card">
-              <div className="office-duty-icon">{item.icon}</div>
               <div className="office-duty-content">
                 <h4>{item.title}</h4>
                 <p>{item.description}</p>
@@ -113,7 +112,7 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="row between">
           <div>
             <span className="card-title">Expectativa Republicana</span>
-            <h2>🎯 O que o ocupante deste cargo DEVERIA fazer?</h2>
+            <h2>O que o ocupante deste cargo DEVERIA fazer?</h2>
           </div>
           <span className="chip chip-blue">Ética & Bem Comum</span>
         </div>
@@ -124,7 +123,6 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="office-grid-duties">
           {duty.whatItShouldDo.map((item, idx) => (
             <div key={idx} className="office-duty-card office-duty-card-should">
-              <div className="office-duty-icon">{item.icon}</div>
               <div className="office-duty-content">
                 <h4>{item.title}</h4>
                 <p>{item.description}</p>
@@ -139,13 +137,12 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="row between">
           <div>
             <span className="card-title" style={{ color: 'var(--red)' }}>Guia Anti-Ilusão Eleitoral</span>
-            <h2>🚫 O que NÃO cabe a este cargo?</h2>
+            <h2>O que NÃO cabe a este cargo?</h2>
           </div>
           <span className="chip chip-red">Não Caia em Falsas Promessas</span>
         </div>
 
         <div className="office-alert-box" style={{ marginTop: 8 }}>
-          <span className="office-alert-icon">⚠️</span>
           <div>
             <strong>Atenção eleitor:</strong> Candidatos em campanhas eleitorais frequentemente prometem ações que não pertencem à sua alçada constitucional. Identifique limites para votar com consciência e cobrar de quem realmente tem a obrigação de agir.
           </div>
@@ -154,7 +151,6 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
         <div className="office-grid-duties" style={{ marginTop: 16 }}>
           {duty.whatItDoesNotDo.map((item, idx) => (
             <div key={idx} className="office-duty-card office-duty-card-not">
-              <div className="office-duty-icon">{item.icon}</div>
               <div className="office-duty-content">
                 <h4>{item.title}</h4>
                 <p>{item.description}</p>
@@ -171,7 +167,7 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
             <span className="card-title">Controle Social</span>
             <span className="badge badge-official">Como Fiscalizar</span>
           </div>
-          <h3>🔍 Checklist do Eleitor Consciente</h3>
+          <h3>Checklist do Eleitor Consciente</h3>
           <p className="small muted">
             Utilize estes pontos práticos para avaliar a atuação de {isCurrentPoliticianOffice ? p.name : `qualquer ${duty.title}`}:
           </p>
@@ -196,7 +192,7 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
             <span className="card-title">Constituição Federal de 1988</span>
             <span className="badge badge-official">Fonte Primária</span>
           </div>
-          <h3>📜 Base Legal e Constitucional</h3>
+          <h3>Base Legal e Constitucional</h3>
           <p className="small muted">
             Consulte os artigos originais da Constituição no portal oficial da Presidência da República:
           </p>
@@ -210,12 +206,12 @@ export function OfficeTab({ politician: p }: { politician: PoliticianDetail }) {
                 rel="noopener noreferrer"
                 className="office-legal-pill"
               >
-                📜 <strong>{l.article}</strong>: {l.description} ↗
+                <strong>{l.article}</strong>: {l.description} ↗
               </a>
             ))}
           </div>
 
-          <h3 style={{ marginTop: 20 }}>💡 Dúvidas Frequentes</h3>
+          <h3 style={{ marginTop: 20 }}>Dúvidas Frequentes</h3>
           <div className="office-faq-list" style={{ marginTop: 8 }}>
             {duty.frequentlyAskedQuestions.map((f, idx) => (
               <div key={idx} className="office-faq-item">

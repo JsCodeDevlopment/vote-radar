@@ -20,17 +20,18 @@ import { useAsync } from '@/hooks/useAsync';
 import { api } from '@/lib/api';
 import { formatBRL, formatNumber, formatPercent } from '@/lib/format';
 import { OFFICE_LABEL, TERM_STATUS_LABEL } from '@/lib/labels';
+import { PartyLogo } from '@/components/PartyLogo';
 import Link from 'next/link';
 
 const TABS = [
-  { key: 'resumo', label: 'Resumo', icon: '📊' },
-  { key: 'votos', label: 'Votações', icon: '🗳️' },
-  { key: 'projetos', label: 'Projetos', icon: '📄' },
-  { key: 'gastos', label: 'Gastos', icon: '💰' },
-  { key: 'bens', label: 'Bens', icon: '💼' },
-  { key: 'gabinete', label: 'Gabinete', icon: '👥' },
-  { key: 'noticias', label: 'Notícias', icon: '📰' },
-  { key: 'cobranca', label: 'Como Cobrar', icon: '📢' },
+  { key: 'resumo', label: 'Resumo' },
+  { key: 'votos', label: 'Votações' },
+  { key: 'projetos', label: 'Projetos' },
+  { key: 'gastos', label: 'Gastos' },
+  { key: 'bens', label: 'Bens' },
+  { key: 'gabinete', label: 'Gabinete' },
+  { key: 'noticias', label: 'Notícias' },
+  { key: 'cobranca', label: 'Como Cobrar' },
 ] as const;
 type TabKey = (typeof TABS)[number]['key'] | 'cargo';
 
@@ -80,17 +81,6 @@ function ProfileInner() {
   if (pol.error || !pol.data) return <ErrorState error={pol.error ?? new Error('não encontrado')} onRetry={pol.reload} />;
   const p = pol.data;
 
-  const officeIcon =
-    p.office === 'PRESIDENTE'
-      ? '🇧🇷'
-      : p.office === 'GOVERNADOR'
-        ? '🏢'
-        : p.office === 'SENADOR'
-          ? '🏛️'
-          : p.office === 'DEPUTADO_FEDERAL'
-            ? '⚖️'
-            : '📍';
-
   return (
     <>
       {/* ── Hero Executivo do Político (Limpo e Direto) ── */}
@@ -118,69 +108,67 @@ function ProfileInner() {
           {/* Dados Principais e Identificação */}
           <div className="profile-hero-main">
             <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="profile-hero-name">{p.name}</h1>
+              <h1 className="profile-hero-name text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">{p.name}</h1>
               <span
-                className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full"
                 style={{
-                  background: p.status === 'IN_OFFICE' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                  color: p.status === 'IN_OFFICE' ? '#22c55e' : '#f59e0b',
-                  border: `1px solid ${p.status === 'IN_OFFICE' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`,
+                  background: p.status === 'IN_OFFICE' ? 'var(--status-live-bg, rgba(34, 197, 94, 0.12))' : 'rgba(245, 158, 11, 0.12)',
+                  color: p.status === 'IN_OFFICE' ? 'var(--status-live, #16a34a)' : '#f59e0b',
+                  border: `1px solid ${p.status === 'IN_OFFICE' ? 'var(--status-live-border, rgba(34, 197, 94, 0.25))' : 'rgba(245, 158, 11, 0.25)'}`,
                 }}
               >
-                ● {TERM_STATUS_LABEL[p.status] ?? 'Situação do Mandato'}
+                <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                {TERM_STATUS_LABEL[p.status] ?? 'Situação do Mandato'}
               </span>
             </div>
 
             {p.civilName && p.civilName !== p.name && (
-              <p className="profile-hero-civilname">Nome civil registrado: {p.civilName}</p>
+              <p className="profile-hero-civilname text-xs text-muted-foreground mb-2">Nome civil: {p.civilName}</p>
             )}
 
-            <div className="profile-pills-row">
-              <span className="pol-office-chip">
-                <span>{officeIcon}</span>
+            <div className="profile-pills-row flex items-center gap-2 flex-wrap mb-4">
+              <span className={`pol-office-chip pol-office-${p.office.toLowerCase()}`}>
                 <span>{OFFICE_LABEL[p.office]}</span>
               </span>
 
-              <span className="pol-badge-party text-xs font-mono">
-                {p.party ?? 'Sem partido'}
-              </span>
+              <PartyLogo party={p.party} size={24} />
 
-              <span className="pol-badge-uf text-xs font-mono">
+              <span className="pol-badge-uf text-xs font-semibold">
                 {p.uf ? `Estado: ${p.uf}` : 'Brasil'}
               </span>
 
               {p.termStart && (
-                <span className="text-xs font-mono text-muted-foreground bg-muted/60 px-2 py-0.5 rounded">
+                <span className="text-xs text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full border border-border">
                   Mandato {new Date(p.termStart).getUTCFullYear()} –{' '}
                   {p.termEnd ? new Date(p.termEnd).getUTCFullYear() : 'atual'}
                 </span>
               )}
 
-              <span className="text-xs font-mono text-muted-foreground bg-muted/60 px-2 py-0.5 rounded">
-                Casa: {p.bodyName}
+              <span className="text-xs text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full border border-border">
+                {p.bodyName}
               </span>
             </div>
 
             {/* Ações Rápidas */}
-            <div className="profile-hero-actions">
+            <div className="profile-hero-actions flex items-center gap-2 flex-wrap">
               <FollowButton politicianId={p.id} />
 
               <button
                 type="button"
-                className="office-info-trigger-btn"
+                className="v-btn -ghost -sm rounded-full text-xs font-semibold inline-flex items-center gap-1.5"
                 onClick={() => setOfficeModalOpen(true)}
                 title={`Entenda o papel e atribuições de um(a) ${OFFICE_LABEL[p.office]}`}
               >
-                🏛️ O que faz este cargo?
+                Atribuições do Cargo
               </button>
 
               <button
                 type="button"
-                className="v-btn -ghost -sm text-xs font-mono inline-flex items-center gap-1.5"
+                className="v-btn -ghost -sm rounded-full text-xs font-semibold inline-flex items-center gap-1.5"
                 onClick={() => router.replace(`/parlamentares/${id}?aba=cobranca`, { scroll: false })}
                 title="Acesse canais de contato e modelos prontos para cobrar este parlamentar"
               >
-                📢 Como Cobrar
+                Como Cobrar
               </button>
 
               {p.source?.url && (
@@ -188,10 +176,10 @@ function ProfileInner() {
                   href={p.source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="v-btn -ghost -sm text-xs font-mono inline-flex items-center gap-1.5"
+                  className="v-btn -ghost -sm rounded-full text-xs font-semibold inline-flex items-center gap-1.5"
                   title="Abrir página oficial do parlamentar"
                 >
-                  🔗 Portal Oficial ↗
+                  Portal Oficial ↗
                 </a>
               )}
 
@@ -253,7 +241,6 @@ function ProfileInner() {
         >
           <div className="profile-kpi-card-head">
             <span className="profile-kpi-label">Gastos Auditados</span>
-            <span className="text-sm">💰</span>
           </div>
           <div className="profile-kpi-value text-primary">
             {formatBRL(p.stats.expensesCents, true)}
@@ -272,7 +259,6 @@ function ProfileInner() {
         >
           <div className="profile-kpi-card-head">
             <span className="profile-kpi-label">Votações Nominais</span>
-            <span className="text-sm">🗳️</span>
           </div>
           <div className="profile-kpi-value">
             {formatNumber(p.stats.votings)}
@@ -291,7 +277,6 @@ function ProfileInner() {
         >
           <div className="profile-kpi-card-head">
             <span className="profile-kpi-label">Proposições</span>
-            <span className="text-sm">📄</span>
           </div>
           <div className="profile-kpi-value">
             {formatNumber(p.stats.authoredProposals)}
@@ -306,7 +291,6 @@ function ProfileInner() {
         >
           <div className="profile-kpi-card-head">
             <span className="profile-kpi-label">Gabinete & Servidores</span>
-            <span className="text-sm">👥</span>
           </div>
           <div className="profile-kpi-value">
             {p.stats.staffCount > 0 ? formatNumber(p.stats.staffCount) : '—'}
@@ -352,7 +336,6 @@ function ProfileInner() {
                 className={`profile-tab-btn ${tab === t.key ? 'active' : ''}`}
                 onClick={() => router.replace(`/parlamentares/${id}?aba=${t.key}`, { scroll: false })}
               >
-                <span>{t.icon}</span>
                 <span>{t.label}</span>
               </button>
             ))}

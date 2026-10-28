@@ -5,19 +5,18 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from './AuthProvider';
-import { Menu, X, Compass, Scale, Building2, Megaphone, LogIn, UserPlus, LogOut, User as UserIcon, Landmark } from 'lucide-react';
+import { Menu, X, Compass, Scale, Building2, Megaphone, LogIn, UserPlus, LogOut, User as UserIcon, Landmark, Sun, Moon, Search } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
 
 const NAV = [
   { href: '/explorar', label: 'Explorar', icon: Compass, description: 'Deputados federais e estaduais, senadores e governantes' },
   { href: '/gastos-uniao', label: 'Gastos da União', icon: Landmark, description: 'Raio-X de todo o orçamento e despesas federais' },
-  // Opções temporariamente comentadas a pedido do usuário:
-  // { href: '/politicas', label: 'Políticas', icon: Scale, description: 'Seu alinhamento com temas e votações' },
-  // { href: '/dashboard', label: 'Meus parlamentares', icon: Building2, description: 'Painel de acompanhamento personalizado' },
   { href: '/como-cobrar', label: 'Como Cobrar', icon: Megaphone, description: 'Guia cívico de controle social e modelos de cobrança' },
 ];
 
 export function Header() {
   const { user, ready, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,33 +52,33 @@ export function Header() {
     <>
       <header className="header">
         <div className="container header-inner">
-          {/* Logo Vote Radar */}
-          <Link href="/" className="logo group flex items-center gap-3">
+          {/* Logo Vote Radar estilo SeuImposto */}
+          <Link href="/" className="logo group flex items-center gap-2.5">
             <img
               src="/logo.png"
               alt="Logo Vote Radar"
-              className="w-9 h-9 rounded-lg object-contain transition-transform group-hover:scale-105 shadow-sm border border-primary/20 bg-background"
+              className="w-8 h-8 rounded-full object-contain border border-border shadow-xs"
             />
             <div className="flex flex-col">
-              <span className="font-mono font-bold tracking-tight text-base text-foreground flex items-center gap-1.5 leading-tight">
+              <span className="font-semibold tracking-tight text-sm text-foreground flex items-center gap-1.5 leading-none">
                 Vote Radar
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </span>
-              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                Dados Oficiais Abertos
+              <span className="text-[10px] text-muted-foreground tracking-wide mt-0.5">
+                Portal Cívico Oficial
               </span>
             </div>
           </Link>
 
-          {/* Navegação Desktop */}
-          <nav className="nav desktop-nav v-seg">
+          {/* Navegação Segmentada Desktop (Capsule switcher igual ao seuimposto.com) */}
+          <nav className="desktop-nav seuimposto-nav-seg">
             {NAV.map((n) => {
               const isActive = pathname.startsWith(n.href);
               return (
                 <Link
                   key={n.href}
                   href={n.href}
-                  className={`v-btn -sm ${isActive ? '-accent font-bold' : '-ghost'}`}
+                  className={`seuimposto-nav-pill ${isActive ? 'active' : ''}`}
                 >
                   {n.label}
                 </Link>
@@ -87,11 +86,33 @@ export function Header() {
             })}
           </nav>
 
-          {/* Ações Desktop */}
-          <div className="header-actions desktop-actions">
+          {/* Ações Desktop: Botão de Tema (Sol/Lua) e Perfil */}
+          <div className="header-actions desktop-actions flex items-center gap-2">
+            <Link
+              href="/explorar"
+              className="seuimposto-icon-btn"
+              title="Buscar na base"
+              aria-label="Buscar"
+            >
+              <Search size={16} />
+            </Link>
+
+            {/* Alternador de tema Claro / Escuro igual ao seuimposto.com */}
+            {mounted && (
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="seuimposto-icon-btn"
+                title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+                aria-label="Alternar tema"
+              >
+                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+            )}
+
             {!ready ? null : user ? (
-              <>
-                <span className="muted small font-mono truncate max-w-[160px]" title={user.name || user.email}>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground truncate max-w-[140px]" title={user.name || user.email}>
                   {user.name || user.email}
                 </span>
                 <button
@@ -103,32 +124,31 @@ export function Header() {
                 >
                   Sair
                 </button>
-              </>
-            ) : (
-              /* Botões de entrar e registrar temporariamente ocultos
-              <>
-                <Link href="/login" className="v-btn -ghost -sm">
-                  Entrar
-                </Link>
-                <Link href="/register" className="v-btn -accent -sm font-bold">
-                  Criar conta
-                </Link>
-              </>
-              */
-              null
-            )}
+              </div>
+            ) : null}
           </div>
 
           {/* Botão Hambúrguer Mobile */}
-          <div className="mobile-header-toggle">
+          <div className="mobile-header-toggle flex items-center gap-2">
+            {mounted && (
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="seuimposto-icon-btn"
+                title="Alternar tema"
+                aria-label="Alternar tema"
+              >
+                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+            )}
             <button
               type="button"
-              className="v-btn -ghost -sm mobile-menu-btn"
+              className="seuimposto-icon-btn mobile-menu-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>

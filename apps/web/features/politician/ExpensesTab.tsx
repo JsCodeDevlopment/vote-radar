@@ -62,7 +62,6 @@ export function ExpensesTab({
         <div className="row between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 260 }}>
             <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: '1.2rem' }}>🔍</span>
               <strong>Auditoria Cívica e Prestação de Contas Verificável</strong>
               <span className="chip chip-green" style={{ fontSize: '0.75rem' }}>100% OFICIAL</span>
             </div>
@@ -79,7 +78,7 @@ export function ExpensesTab({
               className="btn btn-sm btn-ghost"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              💼 Ver Bens Declarados
+              Ver Bens Declarados
             </Link>
             <a
               href={d.source.url}
@@ -88,7 +87,7 @@ export function ExpensesTab({
               className="btn btn-sm btn-outline"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              🏛️ Auditoria no Portal Oficial ↗
+              Auditoria no Portal Oficial ↗
             </a>
           </div>
         </div>
@@ -172,7 +171,7 @@ export function ExpensesTab({
             }}
           >
             <div className="small">
-              💡 <strong>Prestação de Contas Eleitoral com Notas Fiscais:</strong> Este perfil possui{' '}
+              <strong>Prestação de Contas Eleitoral com Notas Fiscais:</strong> Este perfil possui{' '}
               <strong>{formatBRL(d.electoralSummary.totalCents)}</strong> em{' '}
               <strong>{d.electoralSummary.itemCount} comprovantes detalhados</strong> com fornecedor e CNPJ no TSE (2022).
             </div>
@@ -185,7 +184,7 @@ export function ExpensesTab({
               }}
               style={{ fontSize: '0.8rem', padding: '4px 10px', whiteSpace: 'nowrap' }}
             >
-              📑 Ver Notas de 2022 ({d.electoralSummary.itemCount})
+              Ver Notas de 2022 ({d.electoralSummary.itemCount})
             </button>
           </div>
         )}
@@ -262,7 +261,6 @@ export function ExpensesTab({
             </Empty>
           ) : politician?.office === 'PRESIDENTE' || politician?.office === 'GOVERNADOR' || politician?.office === 'DEPUTADO_ESTADUAL' ? (
             <div className="card" style={{ padding: '32px 24px', textAlign: 'center' }}>
-              <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: 12 }}>🏛️</span>
               <h3 style={{ marginBottom: 8, fontSize: '1.25rem' }}>
                 Orçamento de Governo no Exercício de {d.year} ({OFFICE_LABEL[politician.office]})
               </h3>
@@ -281,13 +279,13 @@ export function ExpensesTab({
                     setShowAll(false);
                   }}
                 >
-                  📑 Ver Prestação de Contas Oficial de 2022 (Notas Fiscais e Fornecedores)
+                  Ver Prestação de Contas Oficial de 2022 (Notas Fiscais e Fornecedores)
                 </button>
                 <a href={d.source.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline">
-                  🏛️ Portal Oficial de Transparência ↗
+                  Portal Oficial de Transparência ↗
                 </a>
                 <Link href={`/parlamentares/${politicianId}?aba=bens`} className="btn btn-sm btn-ghost">
-                  💼 Ver Bens Declarados
+                  Ver Bens Declarados
                 </Link>
               </div>
             </div>
@@ -336,7 +334,7 @@ export function ExpensesTab({
                           }}
                           title="Abrir nota fiscal ou recibo eletrônico original"
                         >
-                          📄 Abrir Documento ↗
+                          Abrir Documento ↗
                         </a>
                       ) : (
                         <a
@@ -345,7 +343,7 @@ export function ExpensesTab({
                           rel="noopener noreferrer"
                           className="small muted"
                         >
-                          🏛️ Portal ↗
+                          Portal ↗
                         </a>
                       )}
                     </td>

@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ErrorState, KindBadge, Loading, SourceLink, Avatar } from '@/components/ui';
+import { Avatar, ErrorState, KindBadge, Loading, SourceLink } from '@/components/ui';
 import { useAsync } from '@/hooks/useAsync';
 import { api } from '@/lib/api';
 import { formatBRL, formatNumber } from '@/lib/format';
-import type { StaffMember } from '@/lib/types';
+import { useMemo, useState } from 'react';
 
 export function StaffTab({ politicianId }: { politicianId: string }) {
   const staff = useAsync(() => api.getPoliticianStaff(politicianId), [politicianId]);
@@ -55,7 +54,6 @@ export function StaffTab({ politicianId }: { politicianId: string }) {
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center justify-between">
                 <span>Servidores em Exercício</span>
-                <span>👥</span>
               </span>
               <div className="text-2xl font-black font-mono mt-1 text-foreground">
                 {formatNumber(s.total)}
@@ -71,7 +69,6 @@ export function StaffTab({ politicianId }: { politicianId: string }) {
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center justify-between">
                 <span>Custo Mensal à União</span>
-                <span>💵</span>
               </span>
               <div className="text-2xl font-black font-mono mt-1 text-primary">
                 {formatBRL(s.monthlyCostCents)}
@@ -87,7 +84,6 @@ export function StaffTab({ politicianId }: { politicianId: string }) {
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center justify-between">
                 <span>Custo Anual Projetado</span>
-                <span>📅</span>
               </span>
               <div className="text-2xl font-black font-mono mt-1 text-foreground">
                 {formatBRL(s.annualCostCents)}
@@ -103,7 +99,6 @@ export function StaffTab({ politicianId }: { politicianId: string }) {
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center justify-between">
                 <span>Teto Mensal da Verba</span>
-                <span>🏛️</span>
               </span>
               <div className="text-2xl font-black font-mono mt-1 text-foreground">
                 {s.budgetLimitMonthlyCents ? formatBRL(s.budgetLimitMonthlyCents) : 'Norma própria'}
@@ -290,22 +285,19 @@ export function StaffTab({ politicianId }: { politicianId: string }) {
 
       {/* ── Nota Metodológica e Transparência Legal ── */}
       <div className="card bg-muted/20 border-dashed">
-        <div className="flex items-start gap-2.5">
-          <span className="text-lg">⚖️</span>
-          <div className="space-y-1 text-xs text-muted-foreground">
-            <h4 className="font-bold text-foreground">Metodologia de Cálculo e Transparência Pública</h4>
-            <p>
-              • <strong>Base Legal:</strong> Os vencimentos são calculados com base nas tabelas remuneratórias oficiais vigentes:
-              Lei nº 14.526/2023 (Câmara dos Deputados — níveis SP01 a SP25 e cargos CNE) e Lei nº 14.525/2023 (Senado Federal).
-            </p>
-            <p>
-              • <strong>Custo à União:</strong> O cálculo mensal abrange a remuneração base fixada por lei acrescida do auxílio-alimentação
-              obrigatório (R$ 1.393,10/mês na Câmara e R$ 1.418,00/mês no Senado). A projeção anual contempla 12 meses regulares, gratificação natalina (13º salário), adicional constitucional de 1/3 de férias e 12 cotas de auxílio-alimentação.
-            </p>
-            <p>
-              • <strong>Quadro Efetivo:</strong> O portal exibe estritamente os servidores que constam <em>em exercício</em> no momento da consulta pública, expurgando registros de servidores exonerados ou de legislaturas anteriores.
-            </p>
-          </div>
+        <div className="space-y-1 text-xs text-muted-foreground">
+          <h4 className="font-bold text-foreground">Metodologia de Cálculo e Transparência Pública</h4>
+          <p>
+            • <strong>Base Legal:</strong> Os vencimentos são calculados com base nas tabelas remuneratórias oficiais vigentes:
+            Lei nº 14.526/2023 (Câmara dos Deputados — níveis SP01 a SP25 e cargos CNE) e Lei nº 14.525/2023 (Senado Federal).
+          </p>
+          <p>
+            • <strong>Custo à União:</strong> O cálculo mensal abrange a remuneração base fixada por lei acrescida do auxílio-alimentação
+            obrigatório (R$ 1.393,10/mês na Câmara e R$ 1.418,00/mês no Senado). A projeção anual contempla 12 meses regulares, gratificação natalina (13º salário), adicional constitucional de 1/3 de férias e 12 cotas de auxílio-alimentação.
+          </p>
+          <p>
+            • <strong>Quadro Efetivo:</strong> O portal exibe estritamente os servidores que constam <em>em exercício</em> no momento da consulta pública, expurgando registros de servidores exonerados ou de legislaturas anteriores.
+          </p>
         </div>
       </div>
     </div>

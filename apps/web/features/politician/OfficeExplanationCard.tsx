@@ -44,7 +44,7 @@ export function OfficeExplanationCard({
             onClick={() => setIsModalOpen(true)}
             title="Abrir guia cívico completo com perguntas e respostas"
           >
-            📖 Guia Completo do Cargo
+            Guia Completo do Cargo
           </button>
         </div>
 
@@ -62,7 +62,7 @@ export function OfficeExplanationCard({
             className={`office-card-tab ${activeTab === 'does' ? 'active' : ''}`}
             onClick={() => setActiveTab('does')}
           >
-            💼 O que faz na prática ({duty.whatItDoes.length})
+            O que faz na prática ({duty.whatItDoes.length})
           </button>
           <button
             type="button"
@@ -71,7 +71,7 @@ export function OfficeExplanationCard({
             className={`office-card-tab ${activeTab === 'should' ? 'active' : ''}`}
             onClick={() => setActiveTab('should')}
           >
-            🎯 O que deveria fazer ({duty.whatItShouldDo.length})
+            O que deveria fazer ({duty.whatItShouldDo.length})
           </button>
           <button
             type="button"
@@ -80,7 +80,7 @@ export function OfficeExplanationCard({
             className={`office-card-tab ${activeTab === 'notDoes' ? 'active' : ''}`}
             onClick={() => setActiveTab('notDoes')}
           >
-            🚫 O que NÃO faz / Cuidado ({duty.whatItDoesNotDo.length})
+            O que NÃO faz / Cuidado ({duty.whatItDoesNotDo.length})
           </button>
         </div>
 
@@ -90,7 +90,6 @@ export function OfficeExplanationCard({
             <div className="office-items-grid">
               {duty.whatItDoes.slice(0, 4).map((item, idx) => (
                 <div key={idx} className="office-mini-item">
-                  <span className="office-item-icon">{item.icon}</span>
                   <div>
                     <strong>{item.title}</strong>
                     <p className="small muted">{item.description}</p>
@@ -104,7 +103,6 @@ export function OfficeExplanationCard({
             <div className="office-items-grid">
               {duty.whatItShouldDo.map((item, idx) => (
                 <div key={idx} className="office-mini-item office-mini-item-should">
-                  <span className="office-item-icon">{item.icon}</span>
                   <div>
                     <strong>{item.title}</strong>
                     <p className="small muted">{item.description}</p>
@@ -117,7 +115,6 @@ export function OfficeExplanationCard({
           {activeTab === 'notDoes' && (
             <div>
               <div className="office-warning-callout">
-                <span>⚠️</span>
                 <p className="small">
                   <strong>Não caia em promessas enganosas de campanha:</strong> candidatos a este cargo frequentemente prometem entregas que dependem de outros poderes ou esferas.
                 </p>
@@ -125,7 +122,6 @@ export function OfficeExplanationCard({
               <div className="office-items-grid" style={{ marginTop: 10 }}>
                 {duty.whatItDoesNotDo.map((item, idx) => (
                   <div key={idx} className="office-mini-item office-mini-item-not">
-                    <span className="office-item-icon">{item.icon}</span>
                     <div>
                       <strong>{item.title}</strong>
                       <p className="small muted">{item.description}</p>
@@ -140,7 +136,7 @@ export function OfficeExplanationCard({
         {/* Rodapé com atalho e base legal */}
         <div className="office-card-foot">
           <div className="small muted">
-            🏛️ <strong>Sede:</strong> {duty.bodyName} · ⏳ <strong>Mandato:</strong> {duty.mandateYears} anos · 👥 <strong>Representa:</strong> {duty.representedEntity}
+            <strong>Sede:</strong> {duty.bodyName} · <strong>Mandato:</strong> {duty.mandateYears} anos · <strong>Representa:</strong> {duty.representedEntity}
           </div>
           {showFullLink && (
             <button

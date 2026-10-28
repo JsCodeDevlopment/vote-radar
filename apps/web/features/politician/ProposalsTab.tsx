@@ -71,7 +71,6 @@ export function ProposalsTab({
         <div className="row between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 260 }}>
             <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: '1.2rem' }}>📜</span>
               <strong>Atividade Legislativa e Projetos do Mandato</strong>
               <span className="chip chip-green" style={{ fontSize: '0.75rem' }}>DADOS REAIS</span>
             </div>
@@ -141,7 +140,6 @@ export function ProposalsTab({
       {filteredItems.length === 0 ? (
         politician?.office === 'GOVERNADOR' || politician?.office === 'DEPUTADO_ESTADUAL' ? (
           <div className="card" style={{ padding: '32px 24px', textAlign: 'center' }}>
-            <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: 12 }}>📜</span>
             <h3 style={{ marginBottom: 8, fontSize: '1.25rem' }}>
               Projetos de Lei Estaduais — Tramitação na Assembleia Legislativa
             </h3>
@@ -158,10 +156,10 @@ export function ProposalsTab({
                 rel="noopener noreferrer"
                 className="btn btn-sm btn-primary"
               >
-                🏛️ Consultar Tramitações no Portal Oficial ↗
+                Consultar Tramitações no Portal Oficial ↗
               </a>
               <Link href={`/parlamentares/${politicianId}?aba=cargo`} className="btn btn-sm btn-ghost">
-                ℹ️ Ver Atribuições do Cargo
+                Ver Atribuições do Cargo
               </Link>
             </div>
           </div>
@@ -241,7 +239,7 @@ export function ProposalsTab({
                       fontWeight: 500,
                     }}
                   >
-                    🏛️ Ficha Oficial de Tramitação ↗
+                    Ficha Oficial de Tramitação ↗
                   </a>
                 </div>
                 <SourceLink source={p.source} compact />

@@ -450,11 +450,11 @@ export default function GastosUniaoPage() {
 
   const handleCopyCitizenReceipt = async () => {
     const lines = [
-      `🏛️ MEU COMPROVANTE CÍVICO — GASTOS DO GOVERNO FEDERAL (${selectedYear})`,
+      `MEU COMPROVANTE CÍVICO — GASTOS DO GOVERNO FEDERAL (${selectedYear})`,
       `Renda estimada: R$ ${monthlyIncome.toLocaleString('pt-BR')}/mês | Tributos anuais estimados: R$ ${Math.round(citizenCalculation.totalTax).toLocaleString('pt-BR')}`,
       `----------------------------------------------------`,
       ...citizenCalculation.shares.slice(0, 8).map((s) => {
-        return `• ${s.icon} ${s.areaName}: R$ ${s.yourShareInBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${s.percentage}%)`;
+        return `• ${s.areaName}: R$ ${s.yourShareInBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${s.percentage}%)`;
       }),
       `----------------------------------------------------`,
       `Audite o destino de cada real em: https://voteradar.com.br/gastos-uniao`,
@@ -604,7 +604,6 @@ export default function GastosUniaoPage() {
         <div className="v-card p-5 rounded-xl border border-border flex flex-col justify-between hover:border-amber-500/40 transition-colors">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-mono uppercase tracking-wider">Previdência (INSS)</span>
-            <span className="text-lg">👴</span>
           </div>
           <div>
             <div className="text-2xl font-mono font-bold text-foreground">
@@ -625,7 +624,6 @@ export default function GastosUniaoPage() {
         <div className="v-card p-5 rounded-xl border border-border flex flex-col justify-between hover:border-cyan-500/40 transition-colors">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-mono uppercase tracking-wider">Saúde + Educação</span>
-            <span className="text-lg">🏥</span>
           </div>
           <div>
             <div className="text-2xl font-mono font-bold text-foreground">
@@ -671,37 +669,37 @@ export default function GastosUniaoPage() {
           {[
             {
               id: 'raio-x',
-              label: '📊 Gastos',
+              label: 'Gastos',
               desc: 'Destinação Macro',
             },
             {
               id: 'arrecadacao',
-              label: '💰 Receitas',
+              label: 'Receitas',
               desc: 'Arrecadação Total',
             },
             {
               id: 'balanco',
-              label: '⚖️ Balanço',
+              label: 'Balanço',
               desc: 'Receitas x Despesas',
             },
             {
               id: 'drill-down',
-              label: '🧭 Para Onde Vai',
+              label: 'Para Onde Vai',
               desc: 'Drill-Down Árvore',
             },
             {
               id: 'favorecidos',
-              label: '🔍 Favorecidos',
+              label: 'Favorecidos',
               desc: 'Notas e Favorecidos',
             },
             {
               id: 'calculadora',
-              label: '🧮 Meu Imposto',
+              label: 'Meu Imposto',
               desc: 'Calculadora Cívica',
             },
             {
               id: 'fontes',
-              label: '🏛️ Fontes',
+              label: 'Fontes',
               desc: 'Dados Oficiais',
             },
           ].map((tab) => {
@@ -769,7 +767,7 @@ export default function GastosUniaoPage() {
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    💰 Valor Real (R$)
+                    Valor Real (R$)
                   </button>
                   <button
                     type="button"
@@ -780,7 +778,7 @@ export default function GastosUniaoPage() {
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    🪙 R$ 100
+                    R$ 100
                   </button>
                   <button
                     type="button"
@@ -884,7 +882,6 @@ export default function GastosUniaoPage() {
                       </div>
                     ) : (
                       <div className="space-y-1 text-center max-w-[170px] sm:max-w-[200px]">
-                        <span className="text-2xl sm:text-3xl block">🏛️</span>
                         <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
                           {metricMode === 'real'
                             ? 'Orçamento Total'
@@ -999,7 +996,6 @@ export default function GastosUniaoPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="v-card p-6 rounded-2xl border border-border md:col-span-2 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-amber-500 font-bold">⚠️</span>
                 <h3 className="text-base font-mono font-bold text-foreground">
                   O Engessamento do Orçamento: Por que sobra pouco para obras e investimentos?
                 </h3>
@@ -1210,7 +1206,7 @@ export default function GastosUniaoPage() {
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    💰 Valor Real (R$)
+                    Valor Real (R$)
                   </button>
                   <button
                     type="button"
@@ -1221,7 +1217,7 @@ export default function GastosUniaoPage() {
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    🪙 R$ 100
+                    R$ 100
                   </button>
                   <button
                     type="button"
@@ -1322,7 +1318,6 @@ export default function GastosUniaoPage() {
                       </div>
                     ) : (
                       <div className="space-y-1 text-center max-w-[170px] sm:max-w-[200px]">
-                        <span className="text-2xl sm:text-3xl block">💰</span>
                         <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
                           {revenueMetricMode === 'real'
                             ? 'Receita Total da União'
@@ -1557,7 +1552,7 @@ export default function GastosUniaoPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans text-muted-foreground">
               <div className="p-4 rounded-xl bg-card border border-border/70 space-y-1.5">
                 <span className="font-mono font-bold text-foreground text-sm flex items-center gap-1.5">
-                  📈 Emissão da Dívida (44,3%)
+                  Emissão da Dívida (44,3%)
                 </span>
                 <p>
                   Quase metade da receita da LOA corresponde à <strong>rolagem da dívida pública</strong>.
@@ -1568,7 +1563,7 @@ export default function GastosUniaoPage() {
 
               <div className="p-4 rounded-xl bg-card border border-border/70 space-y-1.5">
                 <span className="font-mono font-bold text-foreground text-sm flex items-center gap-1.5">
-                  👵 Contribuições Vinculadas (22,2%)
+                  Contribuições Vinculadas (22,2%)
                 </span>
                 <p>
                   Tributos como <strong>INSS, COFINS, PIS e CSLL</strong> possuem destinação constitucional obrigatória.
@@ -1578,7 +1573,7 @@ export default function GastosUniaoPage() {
 
               <div className="p-4 rounded-xl bg-card border border-border/70 space-y-1.5">
                 <span className="font-mono font-bold text-foreground text-sm flex items-center gap-1.5">
-                  💼 Impostos de Renda & Consumo (20,2%)
+                  Impostos de Renda & Consumo (20,2%)
                 </span>
                 <p>
                   O Imposto de Renda (IRPF e IRPJ) compõe a maior fonte tributária geral da União. Uma parcela
@@ -1822,7 +1817,7 @@ export default function GastosUniaoPage() {
               <div className="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="font-bold text-amber-500 flex items-center gap-1.5">
-                    🔒 Despesas Obrigatórias
+                    Despesas Obrigatórias
                   </span>
                   <span className="text-muted-foreground">93% do Primário</span>
                 </div>
@@ -1838,7 +1833,7 @@ export default function GastosUniaoPage() {
               <div className="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="font-bold text-destructive flex items-center gap-1.5">
-                    📈 Sensibilidade à Selic
+                    Sensibilidade à Selic
                   </span>
                   <span className="text-muted-foreground">Juros Anuais</span>
                 </div>
@@ -1854,7 +1849,7 @@ export default function GastosUniaoPage() {
               <div className="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="font-bold text-emerald-500 flex items-center gap-1.5">
-                    🏗️ Investimentos Livres
+                    Investimentos Livres
                   </span>
                   <span className="text-muted-foreground">&lt; 2% do Total</span>
                 </div>

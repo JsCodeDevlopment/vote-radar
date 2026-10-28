@@ -79,31 +79,31 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
             className={`office-nav-btn ${activeSection === 'whatItDoes' ? 'active' : ''}`}
             onClick={() => setActiveSection('whatItDoes')}
           >
-            💼 O que faz na prática ({duty.whatItDoes.length})
+            O que faz na prática ({duty.whatItDoes.length})
           </button>
           <button
             className={`office-nav-btn ${activeSection === 'whatItShouldDo' ? 'active' : ''}`}
             onClick={() => setActiveSection('whatItShouldDo')}
           >
-            🎯 O que deveria fazer ({duty.whatItShouldDo.length})
+            O que deveria fazer ({duty.whatItShouldDo.length})
           </button>
           <button
             className={`office-nav-btn ${activeSection === 'whatItDoesNotDo' ? 'active' : ''}`}
             onClick={() => setActiveSection('whatItDoesNotDo')}
           >
-            🚫 O que NÃO cabe ao cargo ({duty.whatItDoesNotDo.length})
+            O que NÃO cabe ao cargo ({duty.whatItDoesNotDo.length})
           </button>
           <button
             className={`office-nav-btn ${activeSection === 'checklist' ? 'active' : ''}`}
             onClick={() => setActiveSection('checklist')}
           >
-            🔍 Como Fiscalizar ({duty.citizenChecklist.length})
+            Como Fiscalizar ({duty.citizenChecklist.length})
           </button>
           <button
             className={`office-nav-btn ${activeSection === 'faq' ? 'active' : ''}`}
             onClick={() => setActiveSection('faq')}
           >
-            ❓ Dúvidas Frequentes
+            Dúvidas Frequentes
           </button>
         </div>
 
@@ -113,7 +113,6 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
             <div className="office-grid-duties">
               {duty.whatItDoes.map((item, idx) => (
                 <div key={idx} className="office-duty-card">
-                  <div className="office-duty-icon">{item.icon}</div>
                   <div className="office-duty-content">
                     <h4>{item.title}</h4>
                     <p>{item.description}</p>
@@ -127,7 +126,6 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
             <div className="office-grid-duties">
               {duty.whatItShouldDo.map((item, idx) => (
                 <div key={idx} className="office-duty-card office-duty-card-should">
-                  <div className="office-duty-icon">{item.icon}</div>
                   <div className="office-duty-content">
                     <h4>{item.title}</h4>
                     <p>{item.description}</p>
@@ -140,7 +138,6 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
           {activeSection === 'whatItDoesNotDo' && (
             <div>
               <div className="office-alert-box">
-                <span className="office-alert-icon">⚠️</span>
                 <div>
                   <strong>Atenção às Promessas Eleitorais Enganosas:</strong>
                   <p>Muitos candidatos prometem medidas que não fazem parte das competências constitucionais deste cargo. Conhecer esses limites protege seu voto!</p>
@@ -149,7 +146,6 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
               <div className="office-grid-duties" style={{ marginTop: 14 }}>
                 {duty.whatItDoesNotDo.map((item, idx) => (
                   <div key={idx} className="office-duty-card office-duty-card-not">
-                    <div className="office-duty-icon">{item.icon}</div>
                     <div className="office-duty-content">
                       <h4>{item.title}</h4>
                       <p>{item.description}</p>
@@ -190,7 +186,7 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
                       rel="noopener noreferrer"
                       className="office-legal-pill"
                     >
-                      📜 <strong>{l.article}</strong>: {l.description} ↗
+                      <strong>{l.article}</strong>: {l.description} ↗
                     </a>
                   ))}
                 </div>
@@ -202,7 +198,7 @@ export function OfficeExplanationModal({ office, isOpen, onClose }: OfficeExplan
             <div className="office-faq-list">
               {duty.frequentlyAskedQuestions.map((f, idx) => (
                 <div key={idx} className="office-faq-item">
-                  <h4>💡 {f.question}</h4>
+                  <h4>{f.question}</h4>
                   <p>{f.answer}</p>
                 </div>
               ))}

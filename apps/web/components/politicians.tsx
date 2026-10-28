@@ -5,9 +5,36 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from './AuthProvider';
 import { Avatar, CompatibilityMeter, KindBadge, SourceLink } from './ui';
-import { OFFICE_LABEL } from '@/lib/labels';
+import { MapPin } from 'lucide-react';
+import { OFFICE_LABEL, STATE_NAMES } from '@/lib/labels';
 import { formatDate } from '@/lib/format';
 import type { FeedItem, PoliticianSummary } from '@/lib/types';
+
+import { PartyLogo } from './PartyLogo';
+
+export function getRegionLabel(politician: PoliticianSummary): string {
+  if (politician.office === 'PRESIDENTE') {
+    return 'Brasil (Nacional)';
+  }
+  const uf = politician.uf?.trim().toUpperCase();
+  if (!uf || uf === 'BR') {
+    return 'Brasil (Nacional)';
+  }
+  const stateName = STATE_NAMES[uf];
+  if (politician.office === 'GOVERNADOR') {
+    return stateName ? `${stateName} (${uf})` : `Estado de ${uf}`;
+  }
+  if (politician.office === 'SENADOR') {
+    return stateName ? `${stateName} (${uf})` : `Senado • ${uf}`;
+  }
+  if (politician.office === 'DEPUTADO_FEDERAL') {
+    return stateName ? `Bancada ${uf} (${stateName})` : `Bancada ${uf}`;
+  }
+  if (politician.office === 'DEPUTADO_ESTADUAL') {
+    return stateName ? `Assembleia ${uf}` : `Bancada ${uf}`;
+  }
+  return stateName ? `${stateName} (${uf})` : `Bancada ${uf}`;
+}
 
 export function FollowButton({ politicianId, size }: { politicianId: string; size?: 'sm' }) {
   const { user, isFollowing, toggleFollow } = useAuth();
@@ -16,7 +43,7 @@ export function FollowButton({ politicianId, size }: { politicianId: string; siz
   const following = isFollowing(politicianId);
   return (
     <button
-      className={`v-btn ${following ? '-ghost' : '-accent'} ${size === 'sm' ? '-sm' : ''}`}
+      className={`v-btn ${following ? '-ghost' : '-accent'} ${size === 'sm' ? '-sm' : ''} rounded-full`}
       disabled={busy}
       onClick={async (e) => {
         e.preventDefault();
@@ -38,110 +65,126 @@ export function FollowButton({ politicianId, size }: { politicianId: string; siz
   );
 }
 
+export function getOfficeSubtitle(politician: PoliticianSummary): string {
+  const uf = politician.uf?.trim().toUpperCase();
+  const stateName = uf && uf !== 'BR' ? STATE_NAMES[uf] || uf : '';
+  switch (politician.office) {
+    case 'PRESIDENTE':
+      return 'Presidência da República';
+    case 'GOVERNADOR':
+      return stateName ? `Governo de ${stateName}` : 'Governo do Estado';
+    case 'SENADOR':
+      return stateName ? `Senador por ${stateName}` : 'Senado Federal';
+    case 'DEPUTADO_FEDERAL':
+      return stateName ? `Deputado Federal (${uf})` : 'Câmara dos Deputados';
+    case 'DEPUTADO_ESTADUAL':
+      return stateName ? `Deputado Estadual (${uf})` : 'Assembleia Legislativa';
+    default:
+      return OFFICE_LABEL[politician.office] || 'Parlamentar';
+  }
+}
+
 export function PoliticianCard({
   politician,
   score,
-  showFollow = true,
+  showFollow = false,
 }: {
   politician: PoliticianSummary;
   score?: number | null;
   showFollow?: boolean;
 }) {
-  const officeIcon =
-    politician.office === 'PRESIDENTE'
-      ? '🇧🇷'
-      : politician.office === 'GOVERNADOR'
-        ? '🏢'
-        : politician.office === 'SENADOR'
-          ? '🏛️'
-          : politician.office === 'DEPUTADO_FEDERAL'
-            ? '⚖️'
-            : '📍';
+  const officeSubtitle = getOfficeSubtitle(politician);
 
   return (
-    <div className="pol-card-v2 group">
-      {/* Top Header Row com Cargo, UF e Status */}
-      <div className="pol-card-top-row">
-        <span className="pol-office-chip">
-          <span>{officeIcon}</span>
-          <span>{OFFICE_LABEL[politician.office]}</span>
-        </span>
+    <div className="pol-card-v2 group flex flex-col justify-between">
+      <div>
+        {/* Top Header Row com Cargo e UF em formato Pill */}
+        <div className="pol-card-top-row flex items-center justify-between mb-5">
+          <span className={`pol-office-chip pol-office-${politician.office.toLowerCase()}`}>
+            <span>{OFFICE_LABEL[politician.office]}</span>
+          </span>
 
-        <div className="flex items-center gap-1.5">
-          <span className="pol-badge-uf font-mono text-xs">
+          <span className="pol-badge-uf text-xs font-bold">
             {politician.uf ? politician.uf : 'BR'}
           </span>
-          <span
-            className="text-[11px] font-mono px-2 py-0.5 rounded-full inline-flex items-center gap-1"
-            style={{
-              background: politician.status === 'IN_OFFICE' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-              color: politician.status === 'IN_OFFICE' ? '#22c55e' : '#f59e0b',
-              border: `1px solid ${politician.status === 'IN_OFFICE' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`,
-            }}
-          >
-            ● {politician.status === 'IN_OFFICE' ? 'Em Exercício' : 'Licenciado'}
-          </span>
         </div>
-      </div>
 
-      {/* Seção Principal: Foto Destacada + Identificação */}
-      <div className="pol-card-main-info">
-        <Link href={`/parlamentares/${politician.id}`} tabIndex={-1} className="flex-shrink-0">
-          {politician.photoUrl ? (
-            <img
-              src={politician.photoUrl}
-              alt={politician.name}
-              className="pol-card-avatar-img transition-transform duration-200 group-hover:scale-105"
-              loading="lazy"
-              onError={(e) => {
-                (e.currentTarget as HTMLElement).style.display = 'none';
-              }}
-            />
-          ) : (
-            <div className="pol-card-avatar-img flex items-center justify-center font-bold text-xl text-primary bg-card">
-              {politician.name.slice(0, 2).toUpperCase()}
-            </div>
-          )}
-        </Link>
+        {/* Visual Hero Central: Foto Proeminente + Nome em Grande Destaque */}
+        <div className="flex flex-col items-center text-center mb-4">
+          <Link
+            href={`/parlamentares/${politician.id}`}
+            tabIndex={-1}
+            className="relative inline-block mb-3"
+          >
+            {politician.photoUrl ? (
+              <img
+                src={politician.photoUrl}
+                alt={politician.name}
+                className="w-24 h-24 rounded-full object-cover border-2 border-border/80 shadow-md ring-4 ring-muted/50 dark:ring-white/[0.06] transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full flex items-center justify-center font-extrabold text-2xl text-primary bg-primary/10 border-2 border-border/80 shadow-md ring-4 ring-muted/50 dark:ring-white/[0.06]">
+                {politician.name.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+          </Link>
 
-        <div className="flex-1 min-w-0">
-          <Link href={`/parlamentares/${politician.id}`} className="no-underline">
-            <h3 className="pol-card-name group-hover:text-primary transition-colors truncate">
+          <Link href={`/parlamentares/${politician.id}`} className="no-underline block max-w-full px-2">
+            <h3
+              className="text-xl sm:text-[1.3rem] font-extrabold text-foreground tracking-tight leading-snug group-hover:text-primary transition-colors line-clamp-2"
+              title={politician.name}
+            >
               {politician.name}
             </h3>
           </Link>
 
-          <div className="pol-card-subinfo">
-            <span className="pol-badge-party">{politician.party ?? 'Sem Partido'}</span>
-            <span>•</span>
-            <span className="truncate">{politician.uf ? `Bancada ${politician.uf}` : 'Brasil'}</span>
+          <p className="text-xs font-medium text-muted-foreground mt-1 truncate max-w-full px-2">
+            {officeSubtitle}
+          </p>
+        </div>
+
+        {/* Badge do Partido em Destaque em Largura Inteira */}
+        <div className="w-full mb-5 py-2.5 px-4 rounded-2xl bg-muted/50 dark:bg-white/[0.04] border border-border/80 flex items-center justify-center gap-3 shadow-xs">
+          <PartyLogo party={politician.party} size={28} />
+          <div className="flex flex-col text-left">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/75 leading-none mb-0.5">
+              Partido
+            </span>
+            <span
+              className="text-sm font-bold text-foreground leading-tight"
+              title={politician.party ?? 'Sem Partido'}
+            >
+              {politician.party ?? 'Sem Partido'}
+            </span>
           </div>
         </div>
+
+        {/* Compatibilidade com o Eleitor */}
+        {score !== undefined && (
+          <div className="mb-4 p-3 rounded-xl bg-muted/40 border border-border">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+              <span className="font-medium">Alinhamento Cívico</span>
+              <strong className="text-foreground tabular-nums">
+                {score !== null ? `${Math.round(score * 100)}%` : '—'}
+              </strong>
+            </div>
+            <CompatibilityMeter score={score} size="sm" />
+          </div>
+        )}
       </div>
 
-      {/* Compatibilidade com o Eleitor */}
-      {score !== undefined && (
-        <div className="mb-3 p-2.5 rounded-lg bg-muted/30 border border-border/60">
-          <div className="flex items-center justify-between text-xs font-mono text-muted-foreground mb-1">
-            <span>Alinhamento Cívico</span>
-            <strong className="text-foreground">
-              {score !== null ? `${Math.round(score * 100)}%` : '—'}
-            </strong>
-          </div>
-          <CompatibilityMeter score={score} size="sm" />
-        </div>
-      )}
-
-      {/* Barra de Ações: Ver Perfil e Seguir */}
-      <div className="pol-card-action-bar">
+      {/* Barra de Ações: Ver Ficha Completa (botão ghost sem seta) */}
+      <div className="pol-card-action-bar mt-auto pt-3 border-t border-border flex items-center justify-center">
         <Link
           href={`/parlamentares/${politician.id}`}
-          className="text-xs font-mono font-bold text-primary hover:underline inline-flex items-center gap-1"
+          className="v-btn -ghost -sm w-full rounded-full text-xs font-bold justify-center text-center py-2.5 tracking-wide transition-all"
         >
-          Ver Ficha Completa →
+          Ver Ficha Completa
         </Link>
-
-        {showFollow && <FollowButton politicianId={politician.id} size="sm" />}
       </div>
     </div>
   );
@@ -149,35 +192,31 @@ export function PoliticianCard({
 
 const FEED_CATEGORY_CONFIG: Record<
   FeedItem['type'],
-  { label: string; icon: string; accentClass: string; badgeBg: string; badgeColor: string }
+  { label: string; accentClass: string; badgeBg: string; badgeColor: string }
 > = {
   VOTE: {
-    label: 'VOTAÇÃO NOMINAL EM PLENÁRIO',
-    icon: '🗳️',
+    label: 'Votação em Plenário',
     accentClass: 'feed-accent-vote',
-    badgeBg: 'rgba(234, 179, 8, 0.15)',
-    badgeColor: '#eab308',
+    badgeBg: 'rgba(234, 179, 8, 0.12)',
+    badgeColor: '#ca8a04',
   },
   EXPENSE: {
-    label: 'AUDITORIA DE GASTOS PÚBLICOS',
-    icon: '💰',
+    label: 'Auditoria de Gastos',
     accentClass: 'feed-accent-expense',
-    badgeBg: 'rgba(34, 197, 94, 0.15)',
-    badgeColor: '#22c55e',
+    badgeBg: 'rgba(34, 197, 94, 0.12)',
+    badgeColor: '#16a34a',
   },
   PROPOSAL: {
-    label: 'TRAMITAÇÃO LEGISLATIVA',
-    icon: '📄',
+    label: 'Tramitação Legislativa',
     accentClass: 'feed-accent-proposal',
-    badgeBg: 'rgba(59, 130, 246, 0.15)',
-    badgeColor: '#3b82f6',
+    badgeBg: 'rgba(59, 130, 246, 0.12)',
+    badgeColor: '#2563eb',
   },
   NEWS: {
-    label: 'IMPRENSA & INVESTIGAÇÃO OFICIAL',
-    icon: '📰',
+    label: 'Notícia & Imprensa',
     accentClass: 'feed-accent-news',
-    badgeBg: 'rgba(236, 72, 153, 0.15)',
-    badgeColor: '#ec4899',
+    badgeBg: 'rgba(236, 72, 153, 0.12)',
+    badgeColor: '#db2777',
   },
 };
 
@@ -186,20 +225,17 @@ export function FeedItemCard({ item }: { item: FeedItem }) {
 
   return (
     <article className="feed-journal-card">
-      <div className={`feed-card-accent-bar ${config.accentClass}`} />
-
-      {/* Eyebrow de Manchete Jornalística */}
-      <div className="feed-journal-eyebrow">
+      {/* Eyebrow com Badge Capsule */}
+      <div className="feed-journal-eyebrow flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span
-            className="feed-badge-kind"
+            className="feed-badge-kind px-2.5 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1.5"
             style={{ background: config.badgeBg, color: config.badgeColor }}
           >
-            <span>{config.icon}</span>
             <span>{config.label}</span>
           </span>
-          <span className="text-muted-foreground text-xs font-mono">•</span>
-          <span className="text-muted-foreground text-xs font-mono">
+          <span className="text-muted-foreground text-xs">•</span>
+          <span className="text-muted-foreground text-xs">
             {formatDate(item.date)}
           </span>
         </div>
@@ -210,26 +246,26 @@ export function FeedItemCard({ item }: { item: FeedItem }) {
       </div>
 
       {/* Identificação da Autoridade Envolvida */}
-      <div className="feed-pol-meta">
+      <div className="feed-pol-meta flex items-center gap-2.5 mb-3">
         <Link href={`/parlamentares/${item.politician.id}`} className="shrink-0">
-          <Avatar name={item.politician.name} url={item.politician.photoUrl} size={36} />
+          <Avatar name={item.politician.name} url={item.politician.photoUrl} size={32} />
         </Link>
         <div>
           <Link
             href={`/parlamentares/${item.politician.id}`}
-            className="feed-pol-name font-mono hover:text-primary transition-colors"
+            className="feed-pol-name font-semibold text-sm hover:underline"
           >
             {item.politician.name}
           </Link>
-          <div className="text-muted-foreground text-xs font-mono">
+          <div className="text-muted-foreground text-xs">
             {item.politician.party ?? 'Sem partido'} • {item.politician.uf ?? 'BR'} ·{' '}
             {OFFICE_LABEL[item.politician.office]}
           </div>
         </div>
       </div>
 
-      {/* Manchete Principal em Estilo Jornalístico */}
-      <h3 className="feed-journal-headline">
+      {/* Manchete Principal */}
+      <h3 className="feed-journal-headline text-base font-semibold leading-snug mb-2">
         {item.href ? (
           <Link href={item.href} className="hover:text-primary transition-colors">
             {item.title}
@@ -240,12 +276,12 @@ export function FeedItemCard({ item }: { item: FeedItem }) {
       </h3>
 
       {/* Lede / Descrição Detalhada */}
-      {item.description && <p className="feed-journal-lead">{item.description}</p>}
+      {item.description && <p className="feed-journal-lead text-xs text-muted-foreground leading-relaxed mb-3">{item.description}</p>}
 
       {/* Rodapé de Auditoria e Comprovante */}
-      <div className="feed-journal-footer">
+      <div className="feed-journal-footer flex items-center justify-between pt-3 border-t border-border text-xs">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-muted-foreground">Fonte Oficial:</span>
+          <span className="text-muted-foreground">Fonte:</span>
           {item.source && <SourceLink source={item.source} compact />}
         </div>
 
@@ -254,9 +290,9 @@ export function FeedItemCard({ item }: { item: FeedItem }) {
             href={item.externalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline text-xs font-mono font-bold inline-flex items-center gap-1"
+            className="text-foreground hover:underline font-semibold inline-flex items-center gap-1"
           >
-            📄 Consultar Documento Original ↗
+            Documento Original ↗
           </a>
         )}
       </div>
@@ -269,20 +305,20 @@ export function SearchBox({ initial = '', autoFocus }: { initial?: string; autoF
   const [q, setQ] = useState(initial);
   return (
     <form
-      className="search max-w-xl mx-auto flex items-center gap-2 p-1.5 rounded-full bg-card border border-border focus-within:border-primary shadow-lg transition-all"
+      className="search max-w-xl mx-auto flex items-center gap-2 p-1.5 rounded-full bg-card border border-border focus-within:border-foreground/40 shadow-xs transition-all"
       onSubmit={(e) => {
         e.preventDefault();
         router.push(`/explorar${q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ''}`);
       }}
     >
       <input
-        className="w-full bg-transparent px-4 py-2 text-foreground font-mono text-sm placeholder:text-muted-foreground outline-none"
+        className="w-full bg-transparent px-4 py-2 text-foreground text-sm placeholder:text-muted-foreground outline-none"
         placeholder="Buscar parlamentar pelo nome…"
         value={q}
         autoFocus={autoFocus}
         onChange={(e) => setQ(e.target.value)}
       />
-      <button className="v-btn -accent -sm shrink-0" type="submit">
+      <button className="v-btn -accent -sm shrink-0 rounded-full px-5" type="submit">
         Buscar
       </button>
     </form>

@@ -28,7 +28,6 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
         <div className="row between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 260 }}>
             <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: '1.2rem' }}>📰</span>
               <strong>Cobertura Jornalística Verídica e Fontes Acessíveis</strong>
               <span className="chip chip-blue" style={{ fontSize: '0.75rem' }}>FONTES REAIS</span>
             </div>
@@ -53,7 +52,7 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
               className="btn btn-sm btn-outline"
               style={{ fontSize: '0.82rem' }}
             >
-              🏛️ Agência Câmara ↗
+              Agência Câmara ↗
             </a>
             <a
               href={`https://www12.senado.leg.br/noticias/busca?q=${encodeURIComponent(politicianName)}`}
@@ -62,7 +61,7 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
               className="btn btn-sm btn-outline"
               style={{ fontSize: '0.82rem' }}
             >
-              ⚖️ Agência Senado ↗
+              Agência Senado ↗
             </a>
             <a
               href={`https://agenciabrasil.ebc.com.br/politica`}
@@ -71,7 +70,7 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
               className="btn btn-sm btn-outline"
               style={{ fontSize: '0.82rem' }}
             >
-              🇧🇷 Agência Brasil (EBC) ↗
+              Agência Brasil (EBC) ↗
             </a>
             <a
               href={`https://g1.globo.com/busca/?q=${encodeURIComponent(politicianName)}`}
@@ -80,7 +79,7 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
               className="btn btn-sm btn-outline"
               style={{ fontSize: '0.82rem' }}
             >
-              🔍 G1 Política ↗
+              G1 Política ↗
             </a>
           </div>
         </div>
@@ -122,7 +121,7 @@ export function NewsTab({ politicianId }: { politicianId: string }) {
                     fontSize: '0.85rem',
                   }}
                 >
-                  📰 Ler Matéria Completa no {n.sourceName} ↗
+                  Ler Matéria Completa no {n.sourceName} ↗
                 </a>
               </div>
             </article>

@@ -124,41 +124,41 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           {/* Badge de Auditoria Cívica Oficial */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-mono uppercase tracking-wider mb-6 shadow-sm backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted border border-border text-foreground text-xs font-semibold tracking-wide mb-6 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Radar Cívico Oficial da República</span>
-            <span className="text-muted-foreground/60">|</span>
-            <span className="text-muted-foreground text-[11px] normal-case hidden sm:inline">
-              Dados 100% auditáveis sem cortes
+            <span className="text-muted-foreground/60">·</span>
+            <span className="text-muted-foreground text-[11px] font-normal hidden sm:inline">
+              Dados 100% auditáveis e abertos
             </span>
           </div>
 
-          {/* Título Principal de Impacto */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-mono font-bold tracking-tight text-foreground leading-[1.15] mb-5">
+          {/* Título Principal de Impacto com Acento Editorial Serif */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] mb-5">
             Acompanhe quem você elegeu com{' '}
-            <span className="text-primary underline decoration-primary/40 underline-offset-8">
+            <span className="font-serif italic font-normal underline decoration-foreground/30 underline-offset-8">
               dados 100% auditáveis
             </span>
             .
           </h1>
 
           {/* Subtítulo Descritivo */}
-          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg font-sans max-w-2xl mx-auto mb-8 leading-relaxed">
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
             Fiscalize votos nominais em plenário, despesas nota a nota da cota parlamentar (CEAP),
             tramitações de leis e o destino de <strong>R$ 5,5 trilhões</strong> do orçamento federal.
           </p>
 
-          {/* Barra de Busca Omnibox Refinada */}
+          {/* Barra de Busca Omnibox Refinada (Capsule Pill estilo SeuImposto) */}
           <form
             onSubmit={handleSearchSubmit}
-            className="max-w-2xl mx-auto flex items-center gap-2 p-2 rounded-2xl bg-card/90 border border-border/80 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 shadow-2xl backdrop-blur-md transition-all mb-6"
+            className="max-w-2xl mx-auto flex items-center gap-2 p-1.5 rounded-full bg-card border border-border focus-within:border-foreground/40 shadow-xs transition-all mb-6"
           >
-            <div className="pl-3 text-muted-foreground flex items-center justify-center">
-              <Search size={20} />
+            <div className="pl-3.5 text-muted-foreground flex items-center justify-center">
+              <Search size={18} />
             </div>
             <input
               type="text"
-              className="w-full bg-transparent px-3 py-2 text-foreground font-mono text-sm sm:text-base placeholder:text-muted-foreground/70 outline-none"
+              className="w-full bg-transparent px-3 py-2.5 text-foreground text-sm sm:text-base placeholder:text-muted-foreground outline-none"
               placeholder="Buscar por nome do deputado, senador, partido ou estado…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -167,14 +167,14 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="text-xs font-mono text-muted-foreground hover:text-foreground px-2 py-1 rounded"
+                className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded-full"
               >
                 Limpar
               </button>
             )}
             <button
               type="submit"
-              className="v-btn -accent -sm sm:-md shrink-0 font-mono font-bold px-5 rounded-xl shadow-md"
+              className="v-btn -accent shrink-0 font-semibold px-6 rounded-full"
             >
               Consultar
             </button>
@@ -282,60 +282,56 @@ export default function HomePage() {
       {/* ───────── PAINEL DE INDICADORES DA REPÚBLICA (KPIS) ───────── */}
       <section className="home-kpi-grid">
         <div className="home-kpi-card">
-          <div className="home-kpi-card-bar" />
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Câmara dos Deputados
             </span>
-            <Users size={18} className="text-primary" />
+            <Users size={16} className="text-muted-foreground" />
           </div>
-          <div className="text-3xl font-mono font-bold text-foreground mb-1">513</div>
-          <p className="text-xs text-muted-foreground">
-            Deputados federais fiscalizados em presença, votos, proposições e despesas da CEAP.
+          <div className="text-3xl font-extrabold text-foreground mb-1 tabular-nums">513</div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Deputados federais fiscalizados em presença, votos nominais e despesas da CEAP.
           </p>
         </div>
 
         <div className="home-kpi-card">
-          <div className="home-kpi-card-bar" />
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Senado Federal
             </span>
-            <Scale size={18} className="text-primary" />
+            <Scale size={16} className="text-muted-foreground" />
           </div>
-          <div className="text-3xl font-mono font-bold text-foreground mb-1">81</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-3xl font-extrabold text-foreground mb-1 tabular-nums">81</div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Senadores da República acompanhados em votações nominais, comissões e PECs.
           </p>
         </div>
 
         <div className="home-kpi-card">
-          <div className="home-kpi-card-bar" />
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Orçamento Federal
             </span>
-            <Landmark size={18} className="text-primary" />
+            <Landmark size={16} className="text-muted-foreground" />
           </div>
-          <div className="text-3xl font-mono font-bold text-primary mb-1">R$ 5,5 Tri</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-3xl font-extrabold text-foreground mb-1 tabular-nums">R$ 5,5 Tri</div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Despesas da União mapeadas por ministérios, programas e emendas parlamentares.
           </p>
         </div>
 
         <div className="home-kpi-card">
-          <div className="home-kpi-card-bar" />
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Autoridades Oficiais
             </span>
-            <ShieldCheck size={18} className="text-primary" />
+            <ShieldCheck size={16} className="text-muted-foreground" />
           </div>
-          <div className="text-3xl font-mono font-bold text-foreground mb-1">
-            {politiciansAsync.data?.total ? `${politiciansAsync.data.total}` : '1.816+'}
+          <div className="text-3xl font-extrabold text-foreground mb-1 tabular-nums">
+            {politiciansAsync.data?.total ? `${politiciansAsync.data.total}` : '1.816'}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Base oficial e auditável de governantes, senadores, deputados federais e estaduais.
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Base oficial de governantes, senadores, deputados federais e estaduais.
           </p>
         </div>
       </section>
@@ -345,13 +341,13 @@ export default function HomePage() {
         <section className="section mb-10">
           <div className="section-head">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-              <h2 className="text-xl font-mono font-bold">Parlamentares que você acompanha</h2>
-              <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <h2 className="text-xl font-bold tracking-tight">Parlamentares que você acompanha</h2>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border font-medium">
                 {followingIds.size} {followingIds.size === 1 ? 'autoridade' : 'autoridades'}
               </span>
             </div>
-            <Link href="/dashboard" className="text-primary text-sm font-mono hover:underline inline-flex items-center gap-1">
+            <Link href="/dashboard" className="text-foreground text-sm font-semibold hover:underline inline-flex items-center gap-1">
               Painel completo de votos e despesas →
             </Link>
           </div>
@@ -370,16 +366,16 @@ export default function HomePage() {
 
       {/* ───────── VITRINE ATIVA DE PARLAMENTARES EM EXERCÍCIO ───────── */}
       <section className="section mb-12">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-3 border-b border-border/60">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-3 border-b border-border">
           <div>
-            <div className="inline-flex items-center gap-2 text-xs font-mono text-primary uppercase tracking-wider mb-1.5">
-              <span>●</span>
+            <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wider mb-1 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Consulta Direta aos Representantes</span>
             </div>
-            <h2 className="text-2xl font-mono font-bold text-foreground flex items-center gap-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
               {showcaseTitle}
             </h2>
-            <p className="text-xs font-mono text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Consulte a ficha completa, despesas nota a nota, presenças e votações nominais.
             </p>
           </div>
@@ -394,7 +390,7 @@ export default function HomePage() {
                     }).toString()}`
                   : ''
               }`}
-              className="v-btn -accent -sm font-mono font-bold shadow-sm inline-flex items-center gap-1.5"
+              className="v-btn -accent -sm font-semibold rounded-full shadow-2xs inline-flex items-center gap-1.5"
             >
               <span>Ver todos no diretório</span>
               <ArrowRight size={14} />
@@ -416,12 +412,12 @@ export default function HomePage() {
             </div>
 
             {/* Rodapé da Vitrine com Botão de Ação */}
-            <div className="mt-8 text-center p-6 rounded-2xl bg-card/60 border border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="mt-8 text-center p-6 rounded-2xl bg-card border border-border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
               <div className="text-left">
-                <span className="font-mono text-sm font-bold text-foreground block">
+                <span className="text-sm font-bold text-foreground block">
                   Deseja filtrar por outros partidos ou municípios?
                 </span>
-                <span className="text-xs text-muted-foreground font-mono">
+                <span className="text-xs text-muted-foreground">
                   O diretório completo contém histórico de patrimônio declarado, servidores de gabinete e discursos.
                 </span>
               </div>
@@ -434,7 +430,7 @@ export default function HomePage() {
                       }).toString()}`
                     : ''
                 }`}
-                className="v-btn -ghost -sm font-mono shrink-0 hover:border-primary"
+                className="v-btn -ghost -sm font-semibold rounded-full shrink-0"
               >
                 Explorar busca avançada →
               </Link>
@@ -450,14 +446,14 @@ export default function HomePage() {
       {/* ───────── CENTRAIS DE FISCALIZAÇÃO CÍVICA (4 PILARES) ───────── */}
       <section className="section mb-12">
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-primary uppercase tracking-wider mb-1.5">
-            <span>◆</span>
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>Módulos de Auditoria Cívica</span>
           </div>
-          <h2 className="text-2xl font-mono font-bold text-foreground">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
             O que você pode fiscalizar no Vote Radar
           </h2>
-          <p className="text-xs sm:text-sm font-sans text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Ferramentas independentes desenvolvidas para colocar o controle dos gastos e das leis nas mãos do cidadão.
           </p>
         </div>
@@ -467,20 +463,19 @@ export default function HomePage() {
           <Link href="/gastos-uniao" className="home-feature-card group">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary uppercase tracking-wider font-bold">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-muted border border-border text-foreground uppercase tracking-wider font-semibold">
                   Auditoria Orçamentária
                 </span>
-                <span className="text-2xl">🏛️</span>
               </div>
-              <h3 className="text-xl font-mono font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
                 Gastos da União (R$ 5,5 Trilhões)
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6 font-sans">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6">
                 Raio-X completo do Orçamento Geral da União: quanto cada ministério arrecada e gasta,
                 repasses de saúde, educação, previdência e as polêmicas emendas parlamentares.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:translate-x-1 transition-transform">
               <span>Navegar pelo Orçamento da República</span>
               <ChevronRight size={16} />
             </div>
@@ -490,20 +485,19 @@ export default function HomePage() {
           <Link href="/explorar?cargo=DEPUTADO_FEDERAL" className="home-feature-card group">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-500 uppercase tracking-wider font-bold">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-muted border border-border text-foreground uppercase tracking-wider font-semibold">
                   Plenário Oficial
                 </span>
-                <span className="text-2xl">🗳️</span>
               </div>
-              <h3 className="text-xl font-mono font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
                 Auditoria de Votações Nominais
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6 font-sans">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6">
                 Saiba com clareza quem votou <strong>SIM</strong>, <strong>NÃO</strong> ou se absteve
                 em reformas tributárias, marcos fiscais, segurança pública e pautas sociais.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:translate-x-1 transition-transform">
               <span>Consultar Votações Nominais</span>
               <ChevronRight size={16} />
             </div>
@@ -513,20 +507,19 @@ export default function HomePage() {
           <Link href="/explorar" className="home-feature-card group">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-500 uppercase tracking-wider font-bold">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-muted border border-border text-foreground uppercase tracking-wider font-semibold">
                   Cota Parlamentar (CEAP)
                 </span>
-                <span className="text-2xl">💰</span>
               </div>
-              <h3 className="text-xl font-mono font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
                 Gastos com Combustível & Viagens
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6 font-sans">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6">
                 Verifique nota fiscal por nota fiscal de cada deputado e senador: aluguel de carros de luxo,
                 voos, consultorias terceirizadas e reembolsos de alimentação.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:translate-x-1 transition-transform">
               <span>Auditar Reembolsos e Fornecedores</span>
               <ChevronRight size={16} />
             </div>
@@ -536,20 +529,19 @@ export default function HomePage() {
           <Link href="/como-cobrar" className="home-feature-card group">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-500 uppercase tracking-wider font-bold">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-muted border border-border text-foreground uppercase tracking-wider font-semibold">
                   Participação Cidadã
                 </span>
-                <span className="text-2xl">📢</span>
               </div>
-              <h3 className="text-xl font-mono font-bold text-foreground group-hover:text-primary transition-colors mb-2">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors mb-2">
                 Guia Cívico: Como Cobrar
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6 font-sans">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6">
                 Modelos prontos de ofício, canais diretos de WhatsApp de gabinetes, ouvidorias e
                 requerimentos da Lei de Acesso à Informação (LAI) para exigir respostas.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:translate-x-1 transition-transform">
               <span>Acessar Modelos e Instruções</span>
               <ChevronRight size={16} />
             </div>
@@ -560,14 +552,14 @@ export default function HomePage() {
       {/* ───────── GUIA RÁPIDO: COMO EXERCER O CONTROLE SOCIAL ───────── */}
       <section className="section mb-12">
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-primary uppercase tracking-wider mb-1.5">
-            <span>⚙️</span>
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>Método de Fiscalização</span>
           </div>
-          <h2 className="text-2xl font-mono font-bold text-foreground">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
             Como funciona a fiscalização no Vote Radar
           </h2>
-          <p className="text-xs sm:text-sm font-sans text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Três etapas diretas para você transformar transparência pública em poder de cobrança cidadã.
           </p>
         </div>
@@ -576,11 +568,11 @@ export default function HomePage() {
           <div className="home-step-card">
             <div className="home-step-num">
               <span>01</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 uppercase tracking-wide">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border font-medium">
                 Busca
               </span>
             </div>
-            <h4 className="text-base font-mono font-bold text-foreground mb-2">
+            <h4 className="text-base font-bold text-foreground mb-2">
               Localize seu Representante
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -592,11 +584,11 @@ export default function HomePage() {
           <div className="home-step-card">
             <div className="home-step-num">
               <span>02</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 uppercase tracking-wide">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border font-medium">
                 Auditoria
               </span>
             </div>
-            <h4 className="text-base font-mono font-bold text-foreground mb-2">
+            <h4 className="text-base font-bold text-foreground mb-2">
               Analise Dados Brutos Reais
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -608,11 +600,11 @@ export default function HomePage() {
           <div className="home-step-card">
             <div className="home-step-num">
               <span>03</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 uppercase tracking-wide">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border font-medium">
                 Ação
               </span>
             </div>
-            <h4 className="text-base font-mono font-bold text-foreground mb-2">
+            <h4 className="text-base font-bold text-foreground mb-2">
               Exerça o Controle Social
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -625,61 +617,61 @@ export default function HomePage() {
 
       {/* ───────── PLANTÃO CÍVICO OFICIAL (FEED EM TEMPO REAL) ───────── */}
       <section className="section mb-12">
-        <div className="feed-journal-header mb-4">
+        <div className="feed-journal-header mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="feed-live-ticker">
-              <span className="feed-pulse-dot" />
-              Plantão Cívico Oficial
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-foreground text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Plantão Cívico Oficial</span>
             </div>
-            <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
               {user && hasFollowing
                 ? 'Atualizações das autoridades que você acompanha'
                 : 'Últimas movimentações apuradas nas bases oficiais da República'}
             </span>
           </div>
 
-          <span className="text-xs font-mono text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             Auditoria Contínua & Neutra
           </span>
         </div>
 
-        {/* Barra de Filtro de Categoria do Feed */}
+        {/* Barra de Filtro de Categoria do Feed em Capsule Pills */}
         <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="text-xs font-mono text-muted-foreground mr-1">Filtrar feed:</span>
+          <span className="text-xs font-semibold text-muted-foreground mr-1">Filtrar:</span>
           <button
             type="button"
             onClick={() => setFeedFilter('ALL')}
-            className={`v-btn -sm ${feedFilter === 'ALL' ? '-accent font-bold' : '-ghost'}`}
+            className={`v-btn -sm rounded-full ${feedFilter === 'ALL' ? '-accent font-semibold' : '-ghost'}`}
           >
             Todos os Registros
           </button>
           <button
             type="button"
             onClick={() => setFeedFilter('VOTE')}
-            className={`v-btn -sm ${feedFilter === 'VOTE' ? '-accent font-bold' : '-ghost'}`}
+            className={`v-btn -sm rounded-full ${feedFilter === 'VOTE' ? '-accent font-semibold' : '-ghost'}`}
           >
-            🗳️ Votações Nominais
+            Votações Nominais
           </button>
           <button
             type="button"
             onClick={() => setFeedFilter('EXPENSE')}
-            className={`v-btn -sm ${feedFilter === 'EXPENSE' ? '-accent font-bold' : '-ghost'}`}
+            className={`v-btn -sm rounded-full ${feedFilter === 'EXPENSE' ? '-accent font-semibold' : '-ghost'}`}
           >
-            💰 Gastos Públicos
+            Gastos Públicos
           </button>
           <button
             type="button"
             onClick={() => setFeedFilter('PROPOSAL')}
-            className={`v-btn -sm ${feedFilter === 'PROPOSAL' ? '-accent font-bold' : '-ghost'}`}
+            className={`v-btn -sm rounded-full ${feedFilter === 'PROPOSAL' ? '-accent font-semibold' : '-ghost'}`}
           >
-            📄 Tramitações & PECs
+            Tramitações & PECs
           </button>
           <button
             type="button"
             onClick={() => setFeedFilter('NEWS')}
-            className={`v-btn -sm ${feedFilter === 'NEWS' ? '-accent font-bold' : '-ghost'}`}
+            className={`v-btn -sm rounded-full ${feedFilter === 'NEWS' ? '-accent font-semibold' : '-ghost'}`}
           >
-            📰 Notícias Oficiais
+            Notícias Oficiais
           </button>
         </div>
 
@@ -700,12 +692,12 @@ export default function HomePage() {
       </section>
 
       {/* ───────── BANNER DE ENGAJAMENTO CÍVICO FINAL ───────── */}
-      <section className="my-10 p-8 sm:p-10 rounded-2xl bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 text-center relative overflow-hidden shadow-xl">
+      <section className="my-10 p-8 sm:p-10 rounded-2xl bg-card border border-border text-center relative overflow-hidden shadow-2xs">
         <div className="max-w-2xl mx-auto relative z-10">
-          <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold mb-3 inline-block">
+          <span className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3 inline-block">
             Cidadania Ativa & Transparência
           </span>
-          <h2 className="text-2xl sm:text-3xl font-mono font-bold text-foreground mb-3">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mb-3">
             A democracia só funciona quando o cidadão fiscaliza.
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-6">
@@ -713,11 +705,11 @@ export default function HomePage() {
             Senado Federal e Tribunal Superior Eleitoral para fortalecer o controle social no Brasil.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/explorar" className="v-btn -accent font-mono font-bold shadow-md">
+            <Link href="/explorar" className="v-btn -accent font-semibold px-6 rounded-full shadow-2xs">
               Explorar Diretório Completo →
             </Link>
-            <Link href="/como-cobrar" className="v-btn -ghost font-mono">
-              📢 Aprenda Como Cobrar
+            <Link href="/como-cobrar" className="v-btn -ghost rounded-full font-semibold px-6">
+              Aprenda Como Cobrar
             </Link>
           </div>
         </div>

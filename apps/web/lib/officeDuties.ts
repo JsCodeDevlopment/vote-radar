@@ -61,37 +61,37 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoes: [
       {
-        icon: '🏛️',
+        icon: '',
         title: 'Chefia de Estado e de Governo',
         description:
           'Dirige a administração federal, define prioridades nacionais, expede decretos e regulamentos para fiel execução das leis e comanda as Forças Armadas.',
       },
       {
-        icon: '📊',
+        icon: '',
         title: 'Execução do Orçamento e Políticas Nacionais',
         description:
           'Elabora os projetos de lei orçamentária (PPA, LDO e LOA) e executa os recursos públicos em saúde (SUS), educação básica e superior (MEC), segurança nacional, transportes e assistência social.',
       },
       {
-        icon: '✍️',
+        icon: '',
         title: 'Sanção e Veto de Leis',
         description:
           'Analisa os projetos aprovados pelo Congresso Nacional, podendo sancioná-los (convertendo em lei) ou vetá-los total ou parcialmente por inconstitucionalidade ou contrariedade ao interesse público.',
       },
       {
-        icon: '⚡',
+        icon: '',
         title: 'Edição de Medidas Provisórias (MPs)',
         description:
           'Em casos excepcionais de relevância e urgência, edita Medidas Provisórias com força imediata de lei, que devem ser apreciadas e votadas pelo Congresso em até 120 dias.',
       },
       {
-        icon: '🌐',
+        icon: '',
         title: 'Relações Exteriores e Defesa da Soberania',
         description:
           'Representa o Brasil no exterior, mantém relações com Estados estrangeiros, celebra tratados, convenções e atos internacionais (sujeitos a referendo do Congresso).',
       },
       {
-        icon: '⚖️',
+        icon: '',
         title: 'Nomeação de Autoridades de Estado',
         description:
           'Indica ministros do Supremo Tribunal Federal (STF), tribunais superiores, Procurador-Geral da República (PGR), diretores do Banco Central e embaixadores — todos dependendo da sabatina e aprovação do Senado Federal.',
@@ -100,19 +100,19 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItShouldDo: [
       {
-        icon: '🛡️',
+        icon: '',
         title: 'Zelo Republicano e Responsabilidade Fiscal',
         description:
           'Equilibrar as contas públicas com responsabilidade, respeitando o teto de gastos e a Lei de Responsabilidade Fiscal, evitando o endividamento desmedido que gera inflação e empobrecimento.',
       },
       {
-        icon: '🤝',
+        icon: '',
         title: 'Respeito à Independência e Harmonia dos Poderes',
         description:
           'Governar dialogando democraticamente com o Congresso Nacional e respeitando as decisões do Poder Judiciário, sem atritos institucionais ou tentativas de interferência.',
       },
       {
-        icon: '🔍',
+        icon: '',
         title: 'Transparência Ativa e Combate à Corrupção',
         description:
           'Garantir autonomia aos órgãos de controle (Controladoria-Geral da União, Polícia Federal, Ministério Público) e manter total clareza na aplicação do dinheiro dos impostos.',
@@ -127,19 +127,19 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoesNotDo: [
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO cria leis ou impostos por vontade própria',
         description:
           'O Presidente não tem poder absolutista. Toda nova lei ou imposto precisa obrigatoriamente de discussão e aprovação pelo Congresso Nacional.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO anula decisões judiciais nem absolve processos comuns',
         description:
           'O Presidente não interfere nas decisões de juízes e tribunais, preservando o Estado de Direito e a separação dos Poderes.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO comanda prefeituras ou governos estaduais',
         description:
           'Estados e municípios possuem autonomia constitucional. O Presidente não pode determinar asfaltamento de rua de bairro ou regras de impostos municipais (como IPTU/ISS).',
@@ -208,35 +208,35 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
     tagline: 'Comanda a administração pública estadual, a segurança pública e os serviços regionais.',
     accentColor: 'oklch(0.68 0.14 150)',
     accentSoft: 'rgba(34, 197, 94, 0.12)',
-    badgeEmoji: '🏛️',
+    badgeEmoji: '',
 
     whatItDoes: [
       {
-        icon: '👮',
+        icon: '',
         title: 'Comandar as Forças de Segurança Pública Estadual',
         description:
           'É a autoridade máxima sobre a Polícia Militar (policiamento ostensivo e ordem pública), Polícia Civil (investigação judiciária e perícias), Corpo de Bombeiros e Polícia Penal do Estado.',
       },
       {
-        icon: '🏥',
+        icon: '',
         title: 'Administrar a Rede Hospitalar e Especializada do SUS',
         description:
           'Gere hospitais estaduais de grande porte, prontos-socorros regionais, centros de tratamento oncológico e laboratórios de saúde pública (LACEN), além de regular a fila estadual de leitos.',
       },
       {
-        icon: '🎓',
+        icon: '',
         title: 'Gerir a Educação Básica (Ensino Médio) e Técnica',
         description:
           'Responsável constitucional pela oferta do ensino médio público, centros de educação profissionalizante e, quando existentes, universidades estaduais públicas.',
       },
       {
-        icon: '💰',
+        icon: '',
         title: 'Arrecadar Tributos Estaduais e Executar o Orçamento',
         description:
           'Administra a cobrança do ICMS (imposto sobre circulação de mercadorias), IPVA e ITCMD, executando as despesas públicas autorizadas pela Assembleia Legislativa.',
       },
       {
-        icon: '🛣️',
+        icon: '',
         title: 'Construir e Manter Rodovias Estaduais e Transportes',
         description:
           'Planeja concessões, pavimentação e manutenção da malha rodoviária estadual (através do DER estadual), além de sistemas metropolitanos de transporte público (metrô, trens e ônibus intermunicipais).',
@@ -245,25 +245,25 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItShouldDo: [
       {
-        icon: '🛡️',
+        icon: '',
         title: 'Reduzir a Violência e Humanizar o Sistema Prisional',
         description:
           'Implementar políticas de segurança baseadas em inteligência, tecnologia de investigação e combate ao crime organizado, garantindo controle ético e vagas adequadas no sistema penitenciário.',
       },
       {
-        icon: '⏱️',
+        icon: '',
         title: 'Zerar Filas de Cirurgias e Exames Especializados',
         description:
           'Equipar hospitais regionais no interior do Estado para evitar deslocamentos desgastantes de pacientes e garantir fornecimento pontual de medicamentos de alto custo.',
       },
       {
-        icon: '📊',
+        icon: '',
         title: 'Garantir Equilíbrio Fiscal e Transparência em Renúncias',
         description:
           'Manter os gastos com pessoal dentro dos limites da Lei de Responsabilidade Fiscal (LRF) e dar transparência pública aos incentivos fiscais concedidos a empresas privadas.',
       },
       {
-        icon: '👩‍🏫',
+        icon: '‍',
         title: 'Valorizar Professores, Policiais e Profissionais de Saúde',
         description:
           'Cumprir o piso salarial nacional dos professores, investir em capacitação contínua e realizar concursos públicos regulares para evitar déficit crônico de servidores efetivos.',
@@ -272,19 +272,19 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoesNotDo: [
       {
-        icon: '⛔',
+        icon: '',
         title: 'Não cria leis de forma autônoma sem o Legislativo',
         description:
           'O Governador pode propor projetos de lei, mas compete exclusivamente à Assembleia Legislativa discutir, emendar e aprovar ou rejeitar os projetos.',
       },
       {
-        icon: '⛔',
+        icon: '',
         title: 'Não administra serviços e tributos exclusivamente municipais',
         description:
           'Não é responsável por creches, postos de saúde de atenção básica (UBS), transporte coletivo urbano municipal, IPTU ou coleta de lixo domiciliar (atribuições do Prefeito).',
       },
       {
-        icon: '⛔',
+        icon: '',
         title: 'Não interfere em decisões judiciais ou no Ministério Público',
         description:
           'O Tribunal de Justiça do Estado e o Ministério Público Estadual (MPE) são instituições autônomas e independentes do Poder Executivo estadual.',
@@ -355,41 +355,41 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
     tagline: 'Guarda o equilíbrio federativo entre os Estados e fiscaliza as autoridades supremas.',
     accentColor: 'oklch(0.72 0.13 250)',
     accentSoft: 'rgba(99, 102, 241, 0.12)',
-    badgeEmoji: '⚖️',
+    badgeEmoji: '',
 
     whatItDoes: [
       {
-        icon: '⚖️',
+        icon: '',
         title: 'Garantir Equilíbrio Federativo Paritário',
         description:
           'Cada Estado da Federação e o Distrito Federal possui exatamente 3 senadores, garantindo que estados com menor população tenham a mesma representação política no Senado que os estados mais populosos.',
       },
       {
-        icon: '📜',
+        icon: '',
         title: 'Criar, Modificar e Votar Leis Nacionais',
         description:
           'Apresenta e vota Projetos de Lei e Propostas de Emenda à Constituição (PECs), atuando também como câmara revisora das matérias aprovadas pela Câmara dos Deputados.',
       },
       {
-        icon: '🎓',
+        icon: '',
         title: 'Sabatinar e Aprovar Altas Autoridades',
         description:
           'Competência privativa e crucial: sabatina e aprova por voto secreto os indicados pelo Presidente para o STF, tribunais superiores, Procuradoria-Geral da República, diretoria do Banco Central e embaixadores.',
       },
       {
-        icon: '🏛️',
+        icon: '',
         title: 'Julgar Crimes de Responsabilidade (Impeachment)',
         description:
           'Processa e julga por crime de responsabilidade o Presidente da República, ministros de Estado, ministros do STF e o Procurador-Geral da República.',
       },
       {
-        icon: '💰',
+        icon: '',
         title: 'Regulação da Dívida Pública e Crédito Externo',
         description:
           'Fixa limites globais para a dívida consolidada da União, dos Estados, do DF e dos Municípios, e autoriza operações de crédito externo contratadas por qualquer ente da federação.',
       },
       {
-        icon: '🔎',
+        icon: '',
         title: 'Fiscalização e Comissões Parlamentares de Inquérito',
         description:
           'Fiscaliza os atos do Poder Executivo, convoca ministros para prestar informações e instala CPIs do Senado ou CPIs Mistas (CPMI) para investigar irregularidades.',
@@ -398,25 +398,25 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItShouldDo: [
       {
-        icon: '🏛️',
+        icon: '',
         title: 'Atuação como Câmara Alta com Visão Estratégica',
         description:
           'Aproveitar o mandato de 8 anos para planejar o desenvolvimento nacional e regional a longo prazo, com serenidade e ponderação, acima das paixões eleitorais momentâneas.',
       },
       {
-        icon: '🔍',
+        icon: '',
         title: 'Rigor e Independência nas Sabatinas',
         description:
           'Sabatina minuciosa de candidatos ao STF e órgãos de controle, avaliando notório saber jurídico e reputação ilibada, sem aprovações meramente protocolares ou por barganha.',
       },
       {
-        icon: '🛡️',
+        icon: '',
         title: 'Defesa Equilibrada do Pacto Federativo',
         description:
           'Zelar pela justa distribuição de receitas tributárias (como o Fundo de Participação dos Estados - FPE) e pela autonomia dos estados contra a centralização em Brasília.',
       },
       {
-        icon: '💡',
+        icon: '',
         title: 'Sobriedade com Gastos Públicos de Gabinete',
         description:
           'Prestar contas de cada assessor contratado e gastos de cota parlamentar, mantendo estrutura enxuta e transparente.',
@@ -425,13 +425,13 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoesNotDo: [
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO executa obras ou serviços públicos diretamente',
         description:
           'Senador não constrói estradas, hospitais nem administra postos de saúde. Pode apenas alocar emendas no orçamento federal para que órgãos executores realizem.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO decide leis municipais ou estaduais exclusivas',
         description:
           'O Senado vota leis de amplitude federal e constitucional; assuntos internos do seu estado ou município cabem aos deputados estaduais e vereadores.',
@@ -495,35 +495,35 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
     tagline: 'Voz direta dos cidadãos na elaboração das leis nacionais e controle do orçamento.',
     accentColor: 'oklch(0.75 0.14 145)',
     accentSoft: 'rgba(52, 211, 153, 0.12)',
-    badgeEmoji: '🏛️',
+    badgeEmoji: '',
 
     whatItDoes: [
       {
-        icon: '👥',
+        icon: '',
         title: 'Representação Popular Direta',
         description:
           'Compõe a bancada de seu estado (mínimo de 8 e máximo de 70 parlamentares conforme o tamanho populacional), levando as demandas dos cidadãos de sua região ao centro das decisões federais em Brasília.',
       },
       {
-        icon: '📄',
+        icon: '',
         title: 'Proposição e Votação de Leis de Âmbito Nacional',
         description:
           'Cria Projetos de Lei Ordinária (PL), Leis Complementares (PLP) e Propostas de Emenda Constitucional (PEC) sobre temas essenciais: Código Penal, Direito Civil, Direito do Trabalho, tributos federais e previdência.',
       },
       {
-        icon: '💵',
+        icon: '',
         title: 'Aprovação do Orçamento e Emendas Parlamentares',
         description:
           'Analisa e vota o Plano Plurianual (PPA), a Lei de Diretrizes Orçamentárias (LDO) e a Lei Orçamentária Anual (LOA), destinando emendas individuais e de bancada para financiar hospitais, escolas e infraestrutura nos municípios.',
       },
       {
-        icon: '🔎',
+        icon: '',
         title: 'Fiscalização e Controle dos Atos do Executivo',
         description:
           'Acompanha a aplicação das verbas federais com auxílio técnico do Tribunal de Contas da União (TCU), convoca ministros de Estado para prestar contas e pode instaurar CPIs para apurar irregularidades graves.',
       },
       {
-        icon: '⚖️',
+        icon: '',
         title: 'Autorização de Processo de Impeachment',
         description:
           'Competência exclusiva: é quem delibera, por votação de no mínimo dois terços dos deputados (342 votos), se autoriza a instauração de processo por crime de responsabilidade contra o Presidente da República.',
@@ -532,25 +532,25 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItShouldDo: [
       {
-        icon: '🎯',
+        icon: '',
         title: 'Priorizar o Interesse Coletivo sobre Interesses Partidários',
         description:
           'Votar projetos avaliando o benefício para toda a sociedade brasileira, sem se curvar a interesses fisiológicos, corporativistas ou trocas de votos por cargos.',
       },
       {
-        icon: '💡',
+        icon: '',
         title: 'Transparência Absoluta na Destinação de Emendas',
         description:
           'Tornar 100% público para quais cidades, entidades e obras foram indicados os recursos das emendas parlamentares, sem uso do orçamento para compra de apoio político.',
       },
       {
-        icon: '📋',
+        icon: '',
         title: 'Assiduidade nas Sessões e Comissões Temáticas',
         description:
           'Comparecer rigorosamente às votações no plenário e aos debates nas comissões técnicas (onde as leis são verdadeiramente moldadas e aperfeiçoadas).',
       },
       {
-        icon: '📉',
+        icon: '',
         title: 'Economia com Cotas e Verba de Gabinete',
         description:
           'Gastar apenas o estritamente necessário da Cota para o Exercício da Atividade Parlamentar (CEAP) e nomear assessores por mérito e capacitação técnica, jamais por nepotismo ou cabide de empregos.',
@@ -559,19 +559,19 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoesNotDo: [
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO executa obras diretamente',
         description:
           'Deputado não asfalta ruas, não constrói postos de saúde nem compra ambulâncias por conta própria. Ele aloca verba orçamentária via emenda; quem licita e executa a obra é a prefeitura, governo estadual ou ministério.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO legisla sobre regras municipais ou impostos locais',
         description:
           'Não tem poder para mexer em taxas municipais, zoneamento urbano, IPTU ou leis da Câmara de Vereadores da sua cidade.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO comanda polícias ou serviços de trânsito',
         description:
           'A gestão diária de policiamento e segurança é do governo estadual (Polícia Militar e Civil) ou municipal (Guarda Municipal).',
@@ -640,35 +640,35 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
     tagline: 'Legisla no âmbito estadual e fiscaliza o uso do dinheiro público pelo Governo do Estado.',
     accentColor: 'oklch(0.74 0.14 50)',
     accentSoft: 'rgba(251, 146, 60, 0.12)',
-    badgeEmoji: '🏙️',
+    badgeEmoji: '',
 
     whatItDoes: [
       {
-        icon: '🏛️',
+        icon: '',
         title: 'Legislar no Âmbito Estadual',
         description:
           'Apresenta e vota projetos de lei sobre competências do Estado: regras sobre tributos estaduais (ICMS, IPVA, ITCMD), segurança pública (Polícia Civil e Militar), sistema penitenciário, universidades estaduais e transporte intermunicipal.',
       },
       {
-        icon: '📊',
+        icon: '',
         title: 'Votar o Orçamento do Estado e Destinar Emendas',
         description:
           'Discute, altera e aprova o orçamento anual estadual enviado pelo Governador e aloca emendas orçamentárias estaduais para reformas de escolas estaduais, hospitais regionais e convênios municipais.',
       },
       {
-        icon: '🔎',
+        icon: '',
         title: 'Fiscalizar o Poder Executivo Estadual',
         description:
           'Fiscaliza os contratos, licitações e atos do Governador e secretarias de Estado, com o auxílio do Tribunal de Contas do Estado (TCE).',
       },
       {
-        icon: '🚨',
+        icon: '',
         title: 'Instaurar CPIs e Processar Crimes de Responsabilidade',
         description:
           'Pode criar Comissões Parlamentares de Inquérito (CPIs) estaduais para apurar corrupção na administração estadual e julgar o Governador em caso de crime de responsabilidade política.',
       },
       {
-        icon: '📜',
+        icon: '',
         title: 'Emendar a Constituição Estadual',
         description:
           'Aprova emendas à Carta Magna do Estado, respeitados os princípios fundamentais da Constituição Federal de 1988.',
@@ -677,25 +677,25 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItShouldDo: [
       {
-        icon: '🛡️',
+        icon: '',
         title: 'Focar nas Verdadeiras Competências do Estado',
         description:
           'Concentrar esforços em áreas que realmente mudam o dia a dia da população estadual: modernização das polícias, melhoria do ensino médio estadual, saneamento regional e infraestrutura rodoviária do estado.',
       },
       {
-        icon: '🔍',
+        icon: '',
         title: 'Independência Real na Fiscalização do Governador',
         description:
           'Exercer fiscalização autônoma e corajosa, sem agir como simples "chancela" cega dos projetos do Palácio do Governo nem transformar a oposição em mera disputa partidária.',
       },
       {
-        icon: '💰',
+        icon: '',
         title: 'Moderação e Transparência com Verbas Indenizatórias',
         description:
           'Controlar com rigor o uso da verba indenizatória estadual, diárias e contratação de servidores comissionados, evitando desvios ou apadrinhamentos políticos.',
       },
       {
-        icon: '🤝',
+        icon: '',
         title: 'Ouvir e Atender Todas as Regiões do Interior e Capital',
         description:
           'Garantir que as políticas públicas estaduais cheguem também aos municípios menores do interior, historicamente desassistidos pelo poder central do Estado.',
@@ -704,19 +704,19 @@ export const OFFICE_DUTIES: Record<Office, OfficeDutiesData> = {
 
     whatItDoesNotDo: [
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO legisla sobre Direito Penal, do Trabalho ou Moeda',
         description:
           'O Deputado Estadual não pode alterar o Código Penal para aumentar penas de crimes nem mudar leis trabalhistas ou aposentadoria geral (são competências exclusivas do Congresso Nacional).',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO resolve problemas municipais de prefeitura',
         description:
           'Não é dever do deputado estadual tapar buracos de ruas de bairro, trocar lâmpadas de postes ou recolher lixo — essas são funções privativas do Prefeito e da Câmara de Vereadores.',
       },
       {
-        icon: '🚫',
+        icon: '',
         title: 'NÃO executa obras diretamente',
         description:
           'O parlamentar pode sugerir ou destinar emendas, mas toda licitação, contratação e execução é atribuição das secretarias do Governo Estadual.',

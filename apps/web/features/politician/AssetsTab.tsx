@@ -55,7 +55,6 @@ export function AssetsTab({
         <div className="row between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 260 }}>
             <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: '1.2rem' }}>🏛️</span>
               <strong>Declaração Oficial de Bens e Patrimônio (TSE DivulgaCandContas)</strong>
               <span className="chip chip-green" style={{ fontSize: '0.75rem' }}>100% OFICIAL</span>
             </div>
@@ -73,7 +72,7 @@ export function AssetsTab({
             className="btn btn-sm btn-outline"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            📋 Ficha Oficial no TSE ↗
+            Ficha Oficial no TSE ↗
           </a>
         </div>
       </div>

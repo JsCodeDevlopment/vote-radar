@@ -138,7 +138,6 @@ export function VotesTab({
         <div className="row between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 260 }}>
             <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: '1.2rem' }}>🗳️</span>
               <strong>Votações Nominais e Deliberações Plenárias</strong>
               <span className="chip chip-green" style={{ fontSize: '0.75rem' }}>PAINEL OFICIAL</span>
             </div>
@@ -216,7 +215,6 @@ export function VotesTab({
       {list.length === 0 ? (
         all.length === 0 ? (
           <div className="card" style={{ padding: '32px 24px', textAlign: 'center' }}>
-            <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: 12 }}>🏛️</span>
             <h3 style={{ marginBottom: 8, fontSize: '1.25rem' }}>
               Nenhuma deliberação registrada para este ano
             </h3>
@@ -229,7 +227,7 @@ export function VotesTab({
                 className="btn btn-sm btn-outline"
                 onClick={() => setSelectedYear(undefined)}
               >
-                🔄 Ver todo o mandato
+                Ver todo o mandato
               </button>
             )}
           </div>
@@ -246,7 +244,7 @@ export function VotesTab({
                 setSearchQuery('');
               }}
             >
-              🔄 Limpar filtros e ver todas ({all.length})
+              Limpar filtros e ver todas ({all.length})
             </button>
           </div>
         )
@@ -315,7 +313,7 @@ function VoteCard({ vote: v, compat, loggedIn }: { vote: PoliticianVote; compat?
                 </span>
               </div>
               <p className="warning-note">
-                ⚠ Esta classificação considera o voto registrado e a política associada ao projeto. Votar contra um
+                Esta classificação considera o voto registrado e a política associada ao projeto. Votar contra um
                 projeto não significa necessariamente ser contra a política em geral.
               </p>
               <details className="why">
@@ -361,7 +359,7 @@ function VoteCard({ vote: v, compat, loggedIn }: { vote: PoliticianVote; compat?
               className="btn btn-sm btn-primary"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}
             >
-              📜 Ver Detalhes do Projeto ➔
+              Ver Detalhes do Projeto ➔
             </Link>
           )}
           <a
@@ -371,7 +369,7 @@ function VoteCard({ vote: v, compat, loggedIn }: { vote: PoliticianVote; compat?
             className="btn btn-sm btn-outline"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}
           >
-            🏛️ Conferir no Portal Oficial ↗
+            Conferir no Portal Oficial ↗
           </a>
         </div>
         <SourceLink source={v.source} compact />

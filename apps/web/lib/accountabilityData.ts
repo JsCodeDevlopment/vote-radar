@@ -49,7 +49,7 @@ export const CIVIC_GUIDE_STEPS: CivicGuideStep[] = [
   {
     step: 1,
     title: 'Reúna Fatos e Dados Concretos',
-    icon: '📊',
+    icon: '',
     summary: 'A cobrança eficiente começa com evidências extraídas de fontes oficiais.',
     details: [
       'Anote o número do Projeto de Lei (PL, PEC, MPV) e a data da votação na aba Votações.',
@@ -61,7 +61,7 @@ export const CIVIC_GUIDE_STEPS: CivicGuideStep[] = [
   {
     step: 2,
     title: 'Mantenha Tom Firme, Técnico e Respeitoso',
-    icon: '⚖️',
+    icon: '',
     summary: 'Ataque o gasto ou o voto, nunca a pessoa física do parlamentar.',
     details: [
       'Você tem direito constitucional de exigir explicações (Art. 5º, XXXIII e XXXIV da CF/88).',
@@ -73,7 +73,7 @@ export const CIVIC_GUIDE_STEPS: CivicGuideStep[] = [
   {
     step: 3,
     title: 'Acione os Canais Oficiais Primários',
-    icon: '✉️',
+    icon: '',
     summary: 'Gere um registro formal antes de qualquer outra medida.',
     details: [
       'Envie primeiro um e-mail formal para o gabinete do parlamentar com o modelo sugerido.',
@@ -85,7 +85,7 @@ export const CIVIC_GUIDE_STEPS: CivicGuideStep[] = [
   {
     step: 4,
     title: 'Controle Social, Redes e Mobilização Coletiva',
-    icon: '📣',
+    icon: '',
     summary: 'Parlamentares são altamente sensíveis à opinião pública do seu eleitorado.',
     details: [
       'Se o gabinete ignorar o contato, publique questionamentos objetivos nas redes sociais oficiais do parlamentar marcando os canais dele.',
@@ -213,7 +213,7 @@ export const ACCOUNTABILITY_TEMPLATES: AccountabilityTemplate[] = [
   {
     id: 'votacao',
     title: 'Cobrança de Votação Nominal',
-    icon: '🗳️',
+    icon: '',
     tagline: 'Exija justificativa sobre voto em projeto de lei, PEC ou medida provisória.',
     description:
       'Modelo para solicitar que o parlamentar esclareça publicamente aos seus representados os motivos técnicos e políticos do seu voto.',
@@ -279,7 +279,7 @@ Eleitor(a) — ${cidade}`;
   {
     id: 'gastos',
     title: 'Questionamento de Gastos (CEAP)',
-    icon: '💰',
+    icon: '',
     tagline: 'Solicite esclarecimentos sobre notas fiscais da Cota Parlamentar.',
     description:
       'Modelo para questionar despesas atípicas, gastos elevados de combustíveis, divulgação de mandato ou consultorias pagas com verba indenizatória.',
@@ -347,7 +347,7 @@ Cidadão(ã) e Contribuinte`;
   {
     id: 'lai',
     title: 'Pedido Formal via LAI (Fala.BR / e-SIC)',
-    icon: '📜',
+    icon: '',
     tagline: 'Protocolo com respaldo na Lei Federal 12.527/2011 e prazos legais.',
     description:
       'Modelo formal para protocolar diretamente no Fala.BR (CGU) ou no Serviço de Informações ao Cidadão (e-SIC) da respectiva Casa Legislativa.',
@@ -405,7 +405,7 @@ ${nome}`;
   {
     id: 'denuncia',
     title: 'Notícia de Irregularidade (MPF / TCU)',
-    icon: '🛡️',
+    icon: '',
     tagline: 'Estrutura formal para comunicar indícios ao Ministério Público ou TCU.',
     description:
       'Utilize este modelo quando tiver levantado elementos com suspeita fundamentada de fraude, notas fiscais inidôneas ou empresas de fachada.',

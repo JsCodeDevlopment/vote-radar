@@ -92,62 +92,62 @@ function ExploreInner() {
   return (
     <>
       <div className="mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-mono uppercase tracking-wider mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted border border-border text-foreground text-xs font-semibold tracking-wide mb-3 shadow-2xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Base Oficial da República Federativa do Brasil
         </div>
-        <h1 className="text-3xl font-mono font-bold tracking-tight text-foreground">
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
           Explorar parlamentares e governantes em exercício
         </h1>
-        <p className="text-muted-foreground text-sm font-sans mt-1">
+        <p className="text-muted-foreground text-sm mt-1">
           Fiscalize 100% dos governantes e representantes em exercício no Brasil: Presidência da República, todos os 27 Governadores, Senado Federal, Câmara dos Deputados e Deputados Estaduais de todo o país.
         </p>
       </div>
 
-      {/* Filtros Rápidos de Cargo */}
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <span className="text-xs font-mono text-muted-foreground mr-1 hidden sm:inline">
+      {/* Filtros Rápidos de Cargo em Capsule Pills */}
+      <div className="flex flex-wrap items-center gap-2 mb-5">
+        <span className="text-xs font-semibold text-muted-foreground mr-1 hidden sm:inline">
           Filtrar cargo:
         </span>
         <button
           type="button"
           onClick={() => update({ cargo: '' })}
-          className={`v-btn -sm ${!office ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${!office ? '-accent font-semibold' : '-ghost'}`}
         >
           Todos
         </button>
         <button
           type="button"
           onClick={() => update({ cargo: 'DEPUTADO_FEDERAL' })}
-          className={`v-btn -sm ${office === 'DEPUTADO_FEDERAL' ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${office === 'DEPUTADO_FEDERAL' ? '-accent font-semibold' : '-ghost'}`}
         >
           Deputados Federais (513)
         </button>
         <button
           type="button"
           onClick={() => update({ cargo: 'DEPUTADO_ESTADUAL' })}
-          className={`v-btn -sm ${office === 'DEPUTADO_ESTADUAL' ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${office === 'DEPUTADO_ESTADUAL' ? '-accent font-semibold' : '-ghost'}`}
         >
           Deputados Estaduais (1.059)
         </button>
         <button
           type="button"
           onClick={() => update({ cargo: 'SENADOR' })}
-          className={`v-btn -sm ${office === 'SENADOR' ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${office === 'SENADOR' ? '-accent font-semibold' : '-ghost'}`}
         >
           Senadores (81)
         </button>
         <button
           type="button"
           onClick={() => update({ cargo: 'GOVERNADOR' })}
-          className={`v-btn -sm ${office === 'GOVERNADOR' ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${office === 'GOVERNADOR' ? '-accent font-semibold' : '-ghost'}`}
         >
           Governadores (27)
         </button>
         <button
           type="button"
           onClick={() => update({ cargo: 'PRESIDENTE' })}
-          className={`v-btn -sm ${office === 'PRESIDENTE' ? '-accent font-bold' : '-ghost'}`}
+          className={`v-btn -sm rounded-full ${office === 'PRESIDENTE' ? '-accent font-semibold' : '-ghost'}`}
         >
           Presidência
         </button>
@@ -155,7 +155,7 @@ function ExploreInner() {
 
       {/* Barra de Busca Principal e Filtros Rápidos */}
       <form
-        className="v-card p-4 mb-6 flex flex-wrap gap-3 items-center"
+        className="v-card p-3 mb-6 flex flex-wrap gap-2.5 items-center rounded-2xl border border-border bg-card shadow-2xs"
         onSubmit={(e) => {
           e.preventDefault();
           update({ q: text.trim() });
@@ -163,7 +163,7 @@ function ExploreInner() {
       >
         <div className="relative flex-1 min-w-[240px]">
           <input
-            className="input w-full pr-8"
+            className="input w-full pr-8 rounded-full"
             placeholder="Buscar por nome, estado (ex: SP) ou partido…"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -171,7 +171,7 @@ function ExploreInner() {
           {text && (
             <button
               type="button"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
               onClick={() => {
                 setText('');
                 update({ q: '' });
@@ -184,7 +184,7 @@ function ExploreInner() {
         </div>
 
         <select
-          className="select min-w-[170px]"
+          className="select min-w-[170px] rounded-full"
           value={office}
           onChange={(e) => update({ cargo: e.target.value })}
         >
@@ -197,7 +197,7 @@ function ExploreInner() {
         </select>
 
         <select
-          className="select min-w-[140px]"
+          className="select min-w-[140px] rounded-full"
           value={uf}
           onChange={(e) => update({ uf: e.target.value })}
         >
@@ -210,7 +210,7 @@ function ExploreInner() {
         </select>
 
         <select
-          className="select min-w-[140px]"
+          className="select min-w-[140px] rounded-full"
           value={party}
           onChange={(e) => update({ partido: e.target.value })}
         >
@@ -222,14 +222,14 @@ function ExploreInner() {
           ))}
         </select>
 
-        <button className="v-btn -accent -md" type="submit">
+        <button className="v-btn -accent -md rounded-full px-6 font-semibold" type="submit">
           Buscar
         </button>
 
         {hasActiveFilters && (
           <button
             type="button"
-            className="v-btn -ghost -md text-muted-foreground hover:text-foreground"
+            className="v-btn -ghost -md rounded-full text-muted-foreground hover:text-foreground"
             onClick={() => {
               setText('');
               router.replace('/explorar');
@@ -241,42 +241,42 @@ function ExploreInner() {
       </form>
 
       {/* Barra de Status e Controles de Paginação Superior */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-2 border-b border-border/40">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-2 border-b border-border">
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
             {list.loading ? (
               'Consultando base oficial…'
             ) : total > 0 ? (
               <>
                 Exibindo{' '}
-                <strong className="text-foreground">
+                <strong className="text-foreground tabular-nums">
                   {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, total)}
                 </strong>{' '}
-                de <strong className="text-primary">{total}</strong> parlamentares em exercício
+                de <strong className="text-foreground tabular-nums">{total}</strong> parlamentares em exercício
               </>
             ) : (
               'Nenhum registro encontrado'
             )}
           </span>
           {hasActiveFilters && (
-            <span className="text-xs px-2 py-0.5 rounded bg-secondary/15 text-secondary font-mono border border-secondary/30">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted text-foreground border border-border font-medium">
               Filtro ativo
             </span>
           )}
         </div>
 
         {/* Seletor de itens por página */}
-        <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold">
           <span>Itens por página:</span>
-          <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+          <div className="inline-flex rounded-full border border-border bg-card p-0.5">
             {PAGE_SIZE_OPTIONS.map((size) => (
               <button
                 key={size}
                 type="button"
-                className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${
                   pageSize === size
-                    ? 'bg-primary text-primary-foreground font-bold shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    ? 'bg-foreground text-background font-bold shadow-2xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
                 onClick={() => update({ itens: size })}
               >
@@ -301,16 +301,16 @@ function ExploreInner() {
 
           {/* Paginação Inferior Completa */}
           {totalPages > 1 && (
-            <div className="v-card p-4 mt-8 flex flex-wrap items-center justify-between gap-4">
-              <div className="text-xs font-mono text-muted-foreground">
-                Página <strong className="text-foreground">{currentPage}</strong> de{' '}
-                <strong className="text-foreground">{totalPages}</strong>
+            <div className="v-card p-4 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card shadow-2xs">
+              <div className="text-xs text-muted-foreground">
+                Página <strong className="text-foreground tabular-nums">{currentPage}</strong> de{' '}
+                <strong className="text-foreground tabular-nums">{totalPages}</strong>
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
-                  className="v-btn -ghost -sm"
+                  className="v-btn -ghost -sm rounded-full"
                   disabled={currentPage <= 1}
                   onClick={() => goToPage(1)}
                   title="Primeira página"
@@ -319,7 +319,7 @@ function ExploreInner() {
                 </button>
                 <button
                   type="button"
-                  className="v-btn -ghost -sm"
+                  className="v-btn -ghost -sm rounded-full"
                   disabled={currentPage <= 1}
                   onClick={() => goToPage(currentPage - 1)}
                   title="Página anterior"
@@ -330,17 +330,17 @@ function ExploreInner() {
                 <div className="flex items-center gap-1 mx-1">
                   {paginationPages.map((item, idx) =>
                     item === 'ellipsis' ? (
-                      <span key={`ellipsis-${idx}`} className="px-2 text-xs text-muted-foreground font-mono">
+                      <span key={`ellipsis-${idx}`} className="px-2 text-xs text-muted-foreground">
                         …
                       </span>
                     ) : (
                       <button
                         key={item}
                         type="button"
-                        className={`w-8 h-8 rounded-md text-xs font-mono transition-colors ${
+                        className={`w-8 h-8 rounded-full text-xs font-semibold transition-colors ${
                           currentPage === item
-                            ? 'bg-primary text-primary-foreground font-bold shadow-sm'
-                            : 'bg-card border border-border text-foreground hover:bg-muted/50'
+                            ? 'bg-foreground text-background shadow-2xs'
+                            : 'bg-card border border-border text-foreground hover:bg-muted'
                         }`}
                         onClick={() => goToPage(item)}
                       >
@@ -352,7 +352,7 @@ function ExploreInner() {
 
                 <button
                   type="button"
-                  className="v-btn -ghost -sm"
+                  className="v-btn -ghost -sm rounded-full"
                   disabled={currentPage >= totalPages}
                   onClick={() => goToPage(currentPage + 1)}
                   title="Próxima página"
@@ -361,7 +361,7 @@ function ExploreInner() {
                 </button>
                 <button
                   type="button"
-                  className="v-btn -ghost -sm"
+                  className="v-btn -ghost -sm rounded-full"
                   disabled={currentPage >= totalPages}
                   onClick={() => goToPage(totalPages)}
                   title="Última página"

@@ -175,35 +175,35 @@ export default function DashboardPage() {
               className={`feed-filter-btn ${feedType === 'ALL' ? 'active' : ''}`}
               onClick={() => setFeedType('ALL')}
             >
-              ⚡ Todos ({feedItems.length})
+              Todos ({feedItems.length})
             </button>
             <button
               type="button"
               className={`feed-filter-btn ${feedType === 'VOTE' ? 'active' : ''}`}
               onClick={() => setFeedType('VOTE')}
             >
-              🗳️ Votações ({voteCount})
+              Votações ({voteCount})
             </button>
             <button
               type="button"
               className={`feed-filter-btn ${feedType === 'EXPENSE' ? 'active' : ''}`}
               onClick={() => setFeedType('EXPENSE')}
             >
-              💰 Gastos ({expenseCount})
+              Gastos ({expenseCount})
             </button>
             <button
               type="button"
               className={`feed-filter-btn ${feedType === 'PROPOSAL' ? 'active' : ''}`}
               onClick={() => setFeedType('PROPOSAL')}
             >
-              📄 Projetos ({proposalCount})
+              Projetos ({proposalCount})
             </button>
             <button
               type="button"
               className={`feed-filter-btn ${feedType === 'NEWS' ? 'active' : ''}`}
               onClick={() => setFeedType('NEWS')}
             >
-              📰 Notícias ({newsCount})
+              Notícias ({newsCount})
             </button>
           </div>
         </div>

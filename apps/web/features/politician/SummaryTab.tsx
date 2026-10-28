@@ -22,7 +22,6 @@ export function SummaryTab({
       <div className="card">
         <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-border/60">
           <div className="flex items-center gap-2">
-            <span className="text-primary text-base">🏛️</span>
             <h2 className="text-base font-mono font-bold uppercase tracking-wider text-foreground">
               Ficha Institucional do Mandato
             </h2>
@@ -123,7 +122,7 @@ export function SummaryTab({
                   href={`mailto:${p.email}`}
                   className="text-xs font-mono text-primary hover:underline break-all"
                 >
-                  ✉️ {p.email}
+                  {p.email}
                 </a>
               ) : (
                 <span className="text-xs font-mono text-muted-foreground">Consultar portal oficial</span>
@@ -142,7 +141,7 @@ export function SummaryTab({
         <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-border/60">
           <div>
             <h3 className="text-base font-mono font-bold text-foreground">
-              ⚡ Movimentação nos Últimos 30 Dias
+              Movimentação nos Últimos 30 Dias
             </h3>
             <p className="text-xs font-mono text-muted-foreground mt-0.5">
               Atividade apurada recentemente nos sistemas oficiais do Poder Público
@@ -188,8 +187,7 @@ export function SummaryTab({
           href={`/parlamentares/${p.id}?aba=gastos`}
           className="p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-200 group no-underline text-inherit"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-2xl">💰</span>
+          <div className="flex items-center justify-end mb-2">
             <span className="text-xs font-mono text-primary group-hover:underline">Acessar aba →</span>
           </div>
           <h4 className="font-mono font-bold text-sm text-foreground mb-1">
@@ -204,8 +202,7 @@ export function SummaryTab({
           href={`/parlamentares/${p.id}?aba=bens`}
           className="p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-200 group no-underline text-inherit"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-2xl">💼</span>
+          <div className="flex items-center justify-end mb-2">
             <span className="text-xs font-mono text-primary group-hover:underline">Acessar aba →</span>
           </div>
           <h4 className="font-mono font-bold text-sm text-foreground mb-1">
@@ -220,8 +217,7 @@ export function SummaryTab({
           href={`/parlamentares/${p.id}?aba=votos`}
           className="p-5 rounded-xl bg-card border border-border hover:border-primary transition-all duration-200 group no-underline text-inherit"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-2xl">🗳️</span>
+          <div className="flex items-center justify-end mb-2">
             <span className="text-xs font-mono text-primary group-hover:underline">Acessar aba →</span>
           </div>
           <h4 className="font-mono font-bold text-sm text-foreground mb-1">
@@ -251,7 +247,7 @@ function AfterVote({ politician: p, compatibility: c }: { politician: Politician
       <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-border/60">
         <div>
           <h3 className="text-base font-mono font-bold text-foreground">
-            🎯 Seu Alinhamento com {p.name}
+            Seu Alinhamento com {p.name}
           </h3>
           <p className="text-xs font-mono text-muted-foreground mt-0.5">
             Comparação automática entre as suas políticas de interesse e as votações nominais registradas
@@ -312,7 +308,6 @@ function AfterVote({ politician: p, compatibility: c }: { politician: Politician
                   className="p-3.5 rounded-xl bg-muted/20 border border-border flex items-start gap-3"
                   key={`${d.votingId}-${d.policyId}`}
                 >
-                  <span className="text-rose-400 text-sm mt-0.5">⚠️</span>
                   <div className="flex-1 space-y-1">
                     <strong className="text-sm font-mono text-foreground block">
                       {d.topicName} — {d.policyName}

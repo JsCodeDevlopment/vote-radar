@@ -90,21 +90,14 @@ export default function ComoCobrarPage() {
   return (
     <div className="space-y-10 py-6 max-w-5xl mx-auto">
       {/* ── Header Principal ── */}
-      <div
-        className="card text-center sm:text-left space-y-4 p-6 sm:p-8"
-        style={{
-          background:
-            'radial-gradient(ellipse at top left, rgba(234, 88, 12, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, transparent 100%)',
-          border: '1px solid rgba(234, 88, 12, 0.3)',
-        }}
-      >
+      <div className="card text-center sm:text-left space-y-4 p-6 sm:p-8 rounded-2xl border border-border bg-card shadow-2xs">
         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
           <div className="space-y-2 flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-mono text-primary font-bold">
-              <Megaphone className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-xs text-foreground font-semibold">
+              <Megaphone className="w-3.5 h-3.5 text-foreground" />
               <span>Controle Social e Cidadania Ativa</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-mono font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               Como Cobrar Seus Representantes Políticos
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
@@ -114,11 +107,11 @@ export default function ComoCobrarPage() {
             </p>
           </div>
 
-          <div className="hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-background/80 border border-border text-center min-w-[200px]">
+          <div className="hidden lg:flex flex-col items-center justify-center p-4 rounded-2xl bg-muted/60 border border-border text-center min-w-[200px]">
             <span className="text-2xl mb-1">🇧🇷</span>
-            <span className="text-xs font-mono font-bold text-foreground">Art. 5º da CF/88</span>
-            <span className="text-[11px] font-mono text-muted-foreground mt-0.5">
-              Direito de Petição e Acesso à Informação
+            <span className="text-xs font-bold text-foreground">Art. 5º da CF/88</span>
+            <span className="text-[11px] text-muted-foreground mt-0.5">
+              Direito de Petição e LAI
             </span>
           </div>
         </div>
@@ -224,7 +217,6 @@ export default function ComoCobrarPage() {
                   <span className="text-xs font-mono font-bold text-primary uppercase tracking-wider">
                     Passo 0{step.step}
                   </span>
-                  <span className="text-xl">{step.icon}</span>
                 </div>
 
                 <h3 className="text-sm font-mono font-bold text-foreground">{step.title}</h3>
@@ -242,7 +234,6 @@ export default function ComoCobrarPage() {
 
               {step.tip && (
                 <div className="p-2.5 rounded-lg bg-background/80 border border-border text-[11px] font-mono text-muted-foreground flex items-start gap-2 mt-2">
-                  <span className="text-primary font-bold">💡</span>
                   <span>{step.tip}</span>
                 </div>
               )}
@@ -271,7 +262,6 @@ export default function ComoCobrarPage() {
         <div>
           <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
             <div className="flex items-center gap-2">
-              <span className="text-lg">✍️</span>
               <h2 className="text-base font-mono font-bold text-foreground uppercase tracking-wider">
                 Gerador de Modelos de E-mail e Ofício
               </h2>
@@ -302,8 +292,7 @@ export default function ComoCobrarPage() {
                     : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">{tmpl.icon}</span>
+                <div className="mb-1">
                   <strong className="text-xs font-mono font-bold truncate block">
                     {tmpl.title}
                   </strong>

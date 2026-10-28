@@ -151,7 +151,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'divida-operacoes',
     name: 'Operações de Crédito e Emissão de Títulos da Dívida',
-    icon: '📈',
+    icon: '',
     color: '#ef4444',
     type: 'OPERACAO_CREDITO',
     typeLabel: 'Operações de Crédito (Refinanciamento)',
@@ -167,7 +167,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'imposto-renda',
     name: 'Imposto de Renda (IRPJ, IRPF e IRRF)',
-    icon: '💼',
+    icon: '',
     color: '#3b82f6',
     type: 'TRIBUTARIA',
     typeLabel: 'Impostos Diretos',
@@ -184,7 +184,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'previdencia-rec',
     name: 'Contribuições Previdenciárias (INSS & Servidores)',
-    icon: '👴',
+    icon: '',
     color: '#f59e0b',
     type: 'CONTRIBUICOES',
     typeLabel: 'Previdência Social',
@@ -201,7 +201,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'cofins-pis',
     name: 'COFINS e PIS/PASEP (Seguridade Social)',
-    icon: '🛒',
+    icon: '',
     color: '#10b981',
     type: 'CONTRIBUICOES',
     typeLabel: 'Contribuições Sociais',
@@ -217,7 +217,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'csll',
     name: 'Contribuição Social sobre o Lucro Líquido (CSLL)',
-    icon: '🏛️',
+    icon: '',
     color: '#06b6d4',
     type: 'CONTRIBUICOES',
     typeLabel: 'Seguridade Social',
@@ -233,7 +233,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'royalties-estatais',
     name: 'Royalties do Petróleo, Pré-Sal & Dividendos de Estatais',
-    icon: '🛢️',
+    icon: '',
     color: '#8b5cf6',
     type: 'PATRIMONIAL_ROYALTIES',
     typeLabel: 'Receitas Patrimoniais',
@@ -249,7 +249,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'iof-ipi',
     name: 'IOF e Imposto sobre Produtos Industrializados (IPI)',
-    icon: '💳',
+    icon: '',
     color: '#eab308',
     type: 'TRIBUTARIA',
     typeLabel: 'Impostos sobre Produção e Crédito',
@@ -265,7 +265,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'taxas-concessoes',
     name: 'Concessões de Infraestrutura, Outorgas e Taxas Federais',
-    icon: '🛣️',
+    icon: '',
     color: '#f97316',
     type: 'TAXAS_SERVICOS',
     typeLabel: 'Concessões e Serviços',
@@ -281,7 +281,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'comercio-exterior',
     name: 'Imposto de Importação e Exportação (Aduaneiro)',
-    icon: '🚢',
+    icon: '',
     color: '#0284c7',
     type: 'TRIBUTARIA',
     typeLabel: 'Comércio Exterior',
@@ -297,7 +297,7 @@ export const REVENUE_CATEGORIES_2025: RevenueCategory[] = [
   {
     id: 'recuperacao-outros',
     name: 'Dívida Ativa, Multas Federais e Outras Receitas',
-    icon: '⚖️',
+    icon: '',
     color: '#64748b',
     type: 'OUTRAS_CORRENTES',
     typeLabel: 'Demais Entradas',
@@ -374,7 +374,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'divida',
       name: 'Juros e Amortização da Dívida Pública',
-      icon: '📈',
+      icon: '',
       color: '#ef4444',
       bgTint: 'rgba(239, 68, 68, 0.08)',
       borderTint: 'rgba(239, 68, 68, 0.3)',
@@ -451,7 +451,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'previdencia',
       name: 'Previdência Social',
-      icon: '👴',
+      icon: '',
       color: '#f59e0b',
       bgTint: 'rgba(245, 158, 11, 0.08)',
       borderTint: 'rgba(245, 158, 11, 0.3)',
@@ -548,7 +548,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'assistencia',
       name: 'Assistência Social e Cidadania',
-      icon: '🤝',
+      icon: '',
       color: '#10b981',
       bgTint: 'rgba(16, 185, 129, 0.08)',
       borderTint: 'rgba(16, 185, 129, 0.3)',
@@ -636,7 +636,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'saude',
       name: 'Saúde Pública (SUS)',
-      icon: '🏥',
+      icon: '',
       color: '#06b6d4',
       bgTint: 'rgba(6, 182, 212, 0.08)',
       borderTint: 'rgba(6, 182, 212, 0.3)',
@@ -843,7 +843,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'educacao',
       name: 'Educação e Universidades Federais',
-      icon: '🎓',
+      icon: '',
       color: '#3b82f6',
       bgTint: 'rgba(59, 130, 246, 0.08)',
       borderTint: 'rgba(59, 130, 246, 0.3)',
@@ -997,7 +997,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'defesa',
       name: 'Defesa Nacional e Forças Armadas',
-      icon: '🛡️',
+      icon: '',
       color: '#6366f1',
       bgTint: 'rgba(99, 102, 241, 0.08)',
       borderTint: 'rgba(99, 102, 241, 0.3)',
@@ -1086,7 +1086,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'trabalho',
       name: 'Trabalho, Emprego e Renda',
-      icon: '💼',
+      icon: '',
       color: '#8b5cf6',
       bgTint: 'rgba(139, 92, 246, 0.08)',
       borderTint: 'rgba(139, 92, 246, 0.3)',
@@ -1146,7 +1146,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'judiciario',
       name: 'Poder Judiciário Federal',
-      icon: '⚖️',
+      icon: '',
       color: '#0284c7',
       bgTint: 'rgba(2, 132, 199, 0.08)',
       borderTint: 'rgba(2, 132, 199, 0.3)',
@@ -1208,7 +1208,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'seguranca',
       name: 'Segurança Pública e Polícia Federal',
-      icon: '🚓',
+      icon: '',
       color: '#eab308',
       bgTint: 'rgba(234, 179, 8, 0.08)',
       borderTint: 'rgba(234, 179, 8, 0.3)',
@@ -1306,7 +1306,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'transporte',
       name: 'Transporte e Infraestrutura Rodoviária',
-      icon: '🛣️',
+      icon: '',
       color: '#f97316',
       bgTint: 'rgba(249, 115, 22, 0.08)',
       borderTint: 'rgba(249, 115, 22, 0.3)',
@@ -1403,7 +1403,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'agricultura',
       name: 'Agricultura e Abastecimento Alimentar',
-      icon: '🌱',
+      icon: '',
       color: '#84cc16',
       bgTint: 'rgba(132, 204, 22, 0.08)',
       borderTint: 'rgba(132, 204, 22, 0.3)',
@@ -1465,7 +1465,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'legislativo',
       name: 'Poder Legislativo Federal e TCU',
-      icon: '🏛️',
+      icon: '',
       color: '#a855f7',
       bgTint: 'rgba(168, 85, 247, 0.08)',
       borderTint: 'rgba(168, 85, 247, 0.3)',
@@ -1527,7 +1527,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'ciencia',
       name: 'Ciência, Tecnologia e Inovação',
-      icon: '🔬',
+      icon: '',
       color: '#14b8a6',
       bgTint: 'rgba(20, 184, 166, 0.08)',
       borderTint: 'rgba(20, 184, 166, 0.3)',
@@ -1588,7 +1588,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'meio-ambiente',
       name: 'Meio Ambiente e Combate ao Desmatamento',
-      icon: '🌳',
+      icon: '',
       color: '#15803d',
       bgTint: 'rgba(21, 128, 61, 0.08)',
       borderTint: 'rgba(21, 128, 61, 0.3)',
@@ -1649,7 +1649,7 @@ export const FEDERAL_BUDGET_2025: FederalBudgetData = {
     {
       id: 'outros',
       name: 'Outras Funções de Governo e Habitação',
-      icon: '🏙️',
+      icon: '',
       color: '#64748b',
       bgTint: 'rgba(100, 116, 139, 0.08)',
       borderTint: 'rgba(100, 116, 139, 0.3)',
